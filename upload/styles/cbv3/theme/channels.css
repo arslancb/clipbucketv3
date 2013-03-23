@@ -56,3 +56,73 @@
 .user-block-description {
     font-size: 13px;
 }
+
+/* Subscriptions */
+.subscriptions-header-block {
+    display: block;
+}
+
+.subscription-block .name-avatar {
+    margin-bottom: 5px;
+}
+
+.subscription-block .avatar.img-polaroid {
+    padding: 3px;
+}
+
+.subscription-block .name-avatar .name {
+    margin-left: 58px;
+    line-height: 26px;
+    font-size: 13px;
+    font-weight: normal;
+    color: #666;
+}
+
+.subscription-block {
+    list-style: none;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+    margin: -1px -10px 0px;
+    padding: 15px 15px 0px;
+}
+
+.subscription-block .subscription-details {
+    margin: 0px 58px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 15px;
+    margin-bottom: -1px;
+    color: #333;
+    font-size: 13px;
+}
+
+.subscription-block .subscription-details .content-thumb {
+    margin-right: 8px;
+}
+
+.subscription-details span {
+    display: block;
+    font-size: 11px;
+    color: #999;
+    margin-top: 3px;
+    max-height: 40px;
+    overflow: hidden;
+}
+
+.subscription-block .subscription-details .content-title {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 14px;
+}
+
+.subscription-block:hover {
+    border-bottom-color: #ccc;
+    border-top-color: #ccc;
+}
+
+.subscription-block:hover .subscription-details {
+    border-bottom-color: transparent;
+}

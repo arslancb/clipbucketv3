@@ -450,3 +450,24 @@ CREATE TABLE IF NOT EXISTS `cb_objects_cache` (
 -- @aithor: Fawaz Tahir
 --
 ALTER TABLE  `{tbl_prefix}collections` CHANGE  `cover_photo`  `cover_photo` TEXT NOT NULL
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cb_subscriptions`
+-- 1/8/2012
+-- @aithor: Fawaz Tahir
+--
+
+DROP TABLE IF EXISTS `{tbl_prefix}subscriptions`;
+CREATE TABLE IF NOT EXISTS  `{tbl_prefix}subscriptions` (
+`subscription_id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`userid` BIGINT NOT NULL ,
+`subscribed_to` BIGINT NOT NULL ,
+`subscribed_content` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`type` VARCHAR( 10 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT  'user',
+`time_added` BIGINT NOT NULL ,
+`date_added` DATETIME NOT NULL ,
+`last_activity` DATETIME NOT NULL ,
+`new_activity` INT NOT NULL
+) ENGINE = MYISAM ;

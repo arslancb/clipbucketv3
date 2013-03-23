@@ -665,6 +665,7 @@ function get_basic_user_details($uid)
 /**
  * This function sets the user profile item.
  * 
+ * @author Fawaz Tahir <fawaz.cb@gmail.com>
  * @global array $cb_profile_item_callbacks
  * @param int $id
  * @param string $type
@@ -715,7 +716,7 @@ function set_user_profile_item( $id, $type, $uid = null ) {
 
 /**
  * Function adds a new profile item type and it's required callbacks.
- * <em>$type</em> should be unique if already exists this will be not add.
+ * <em>$type</em> should be unique if already exists this will be not added.
  * 
  * <em>$exists</em>, this callback should check if item exists or not. Profile item
  * will not update untill this callback returns true. item id is passed to this callback
@@ -723,6 +724,7 @@ function set_user_profile_item( $id, $type, $uid = null ) {
  * <em>$display</em>, this callback should get details of item using $id passed to
  * callback. Use fetch_template_file to return html template.
  * 
+ * @author Fawaz Tahir <fawaz.cb@gmail.com>
  * @global array $cb_profile_item_callbacks
  * @param string $type
  * @param string $exists
@@ -751,6 +753,7 @@ function add_profile_item_type_callback( $type, $exists, $display ) {
  * Get profile item of provided $uid, if null
  * current loggedin userid is used
  * 
+ * @author Fawaz Tahir <fawaz.cb@gmail.com>
  * @param int $uid
  * @return array|boolean
  */
@@ -759,7 +762,7 @@ function get_profile_item( $uid = null ) {
         $uid = userid();
     }
     
-    $query = "SELECT pro.profile_item FROM ".tbl('user_profile')." as pro ";
+    $query = "SELECT pro.profile_item FROM ".  cb_sql_table( 'user_profile', 'pro' );
     $query .= " WHERE pro.userid = '".mysql_clean( $uid )."' ";
     
     $result = db_select( $query );
@@ -775,6 +778,7 @@ function get_profile_item( $uid = null ) {
  * Checks if provided id and type is current
  * profile item or not
  * 
+ * @author Fawaz Tahir <fawaz.cb@gmail.com>
  * @param int $id
  * @param string $type
  * @param int $uid
@@ -794,6 +798,7 @@ function is_profile_item( $id, $type, $uid = null ) {
 /**
  * Remove profile item of user
  * 
+ * @author Fawaz Tahir <fawaz.cb@gmail.com>
  * @global OBJECT $userquery
  * @param int $uid
  */
@@ -806,6 +811,7 @@ function remove_profile_item( $uid=null ) {
 /**
  * Displays the profile item of user
  * 
+ * @author Fawaz Tahir <fawaz.cb@gmail.com>
  * @global array $cb_profile_item_callbacks
  * @param int $uid
  * @param array $assign
@@ -831,4 +837,21 @@ function display_profile_item( $uid = null, $assign = array() ) {
     }
 }
 
+function get_user_profile_field( $userid, $field ) {
+    if ( user_exists( $userid ) ) {
+        $query = "SELECT user_profile.".$field." FROM ".cb_sql_table( 'user_profile' );
+        
+        start_where();
+        add_where(" user_profile.userid = '".$userid."' ");
+        $query .= " WHERE ".get_where();
+        end_where();
+        
+        $results = db_select( $query );
+        if( $results ) {
+            return $results[ 0 ][ $field ];
+        } else {
+            return false;
+        }
+    }
+}
 ?>

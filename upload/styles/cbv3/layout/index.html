@@ -18,18 +18,13 @@
         {if has_sidebar('index-sidebar-left')}
             {sidebar('index-sidebar-left')}
         {else}
-            {if $userquery->udetails && $userquery->udetails.total_subscriptions > 0}
-                {$subscriptions=$userquery->get_user_subscriptions($userquery->udetails.userid)}
-                {if $subscriptions}
-                    <div class="cb-widget">
-                        <h2 class="cb-widget-title">{lang code='Subscriptions'}</h2>
-                        <ul class="global-nav-list margin0 cbv3-scroller">
-                            {foreach $subscriptions as $sub}
-                                {include_template_file file="blocks/user.html" user=$sub display_method='index_sidebar' subs='true'}
-                            {/foreach}
-                        </ul>
-                    </div>
-                {/if}
+            {if has_subscriptions()}
+                <div class="cb-widget">
+                    <h2 class="cb-widget-title">{lang code='Subscriptions'}</h2>
+                    <ul class="global-nav-list margin0 cbv3-scroller">
+                        {display_subscriptions_list()}
+                    </ul>
+                </div>
             {/if}
             <div class="cb-widget">
                 <h2 class="cb-widget-title">{lang code='Browse'}</h2>
@@ -122,60 +117,67 @@
             {/if}        
         {/if}
     </div>
-
+    
     <div class="global-content-column pull-left">
         
-        {$featured_videos=get_videos(['limit'=>8,'featured'=>'yes'])}
-        {if $featured_videos}
-        <div class="featured-middle-content" id="featured-videos-wrapper">
-            <h3 class="marginB10">{lang code='Featured Videos'} <small class="marginL10"><a href="{link name=sort sort=featured type=videos}">More Videos</a></small></h3>
-            <div class="carousel slide" id="featured-videos">
-                <div class="carousel-inner">
-                    <div class="inlineblock-fix">
-                        {foreach $featured_videos as $ftvideo}
+        {$subscriptions_content=display_user_subscriptions_content()}
+        {if $subscriptions_content}
+            {$subscriptions_content}
+        {else}
+            {$featured_videos=get_videos(['limit'=>8,'featured'=>'yes'])}
+            {if $featured_videos}
+            <div class="featured-middle-content" id="featured-videos-wrapper">
+                <h3 class="marginB10">{lang code='Featured Videos'} <small class="marginL10"><a href="{link name=sort sort=featured type=videos}">More Videos</a></small></h3>
+                <div class="carousel slide" id="featured-videos">
+                    <div class="carousel-inner">
+                        <div class="inlineblock-fix">
+                            {foreach $featured_videos as $ftvideo}
 
-                            {if $ftvideo@first || $open_tag=='true'}
-                                {$open_tag=''}
-                                <div class="item {if $ftvideo@first}active{/if}">
-                            {/if}
-                            <a href="{videoLink vdetails=$ftvideo}" class="featured-video-block">
-                                <div class="featured-video-inner-block">
-                                    <div class="featured-video-thumb-block thumbs-1 one-thumb">
-                                        <img src="{getThumb vdetails=$ftvideo size='300x250' num='big'}" class="featured-video-thumb small" />
+                                {if $ftvideo@first || $open_tag=='true'}
+                                    {$open_tag=''}
+                                    <div class="item {if $ftvideo@first}active{/if}">
+                                {/if}
+                                <a href="{videoLink vdetails=$ftvideo}" class="featured-video-block">
+                                    <div class="featured-video-inner-block">
+                                        <div class="featured-video-thumb-block thumbs-1 one-thumb">
+                                            <img src="{getThumb vdetails=$ftvideo size='300x250' num='big'}" class="featured-video-thumb small" />
+                                        </div>
+                                        <h4>{$ftvideo.title}</h4>
+                                        <p>{$ftvideo.description|description|strip_tags|truncate:70}</p>
                                     </div>
-                                    <h4>{$ftvideo.title}</h4>
-                                    <p>{$ftvideo.description|description|strip_tags|truncate:70}</p>
-                                </div>
-                            </a>
-                            {if $ftvideo@iteration % 2 == 0 || $ftvideo@last}
-                                {$open_tag='true'}
-                                </div>
-                            {/if}
-                        {/foreach}                
+                                </a>
+                                {if $ftvideo@iteration % 2 == 0 || $ftvideo@last}
+                                    {$open_tag='true'}
+                                    </div>
+                                {/if}
+                            {/foreach}                
+                        </div>
                     </div>
+                    <a class="carousel-control left" href="#featured-videos" data-slide="prev">&lsaquo;</a>
+                    <a class="carousel-control right" href="#featured-videos" data-slide="next">&rsaquo;</a>
                 </div>
-                <a class="carousel-control left" href="#featured-videos" data-slide="prev">&lsaquo;</a>
-                <a class="carousel-control right" href="#featured-videos" data-slide="next">&rsaquo;</a>
             </div>
-        </div>
-        {/if}
-                
-        {$photos=get_photos(['limit'=>9])}
-        {if $photos}
-            {$heading='Latest Photos'}
-            {$more_mode='recent'}            
+            {/if}
+
+            {$photos=get_photos(['limit'=>9])}
+            {if $photos}
+                {$heading='Latest Photos'}
+                {$more_mode='recent'}            
+            {/if}
+
+            {if $photos}            
+                <h3 class="marginB10">
+                    <a href="{link name=sort sort=$more_mode type=photos}">{lang code=$heading}</a>
+                </h3>
+                <div id="index-photos-container">
+                {foreach $photos as $photo}
+                    {include_template_file file="blocks/photo.html" photo=$photo display_method="index_photos" iteration=$photo@iteration last=$photo@last first=$photo@first}
+                {/foreach}
+                </div>
+            {/if}    
+        
         {/if}
         
-        {if $photos}            
-            <h3 class="marginB10">
-                <a href="{link name=sort sort=$more_mode type=photos}">{lang code=$heading}</a>
-            </h3>
-            <div id="index-photos-container">
-            {foreach $photos as $photo}
-                {include_template_file file="blocks/photo.html" photo=$photo display_method="index_photos" iteration=$photo@iteration last=$photo@last first=$photo@first}
-            {/foreach}
-            </div>
-        {/if}
     </div>
     <div id="global-content-full-height"></div>
     </div>

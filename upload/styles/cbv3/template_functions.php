@@ -137,22 +137,26 @@ function cbv3_photo_tagger_options( $options ) {
 register_filter( 'tagger_configurations', 'cbv3_photo_tagger_options' );
 
 function show_template_preview( $template ) {
-    global $cbtpl;
-    $name = $template['name'];
-    $preview = $cbtpl->get_preview_thumb( $template['dir'] );
-    
-    if ( $preview ) {
-        $name = "<span class='template-name'>$name</span>";
-        $preview = "<img src='$preview' class='template-thumb' />";
-        $author = "<span class='template-author'>".$template['author']."</span>";
+//    global $cbtpl;
+//    $name = $template['name'];
+//    $preview = $cbtpl->get_preview_thumb( $template['dir'] );
+//    
+//    if ( $preview ) {
+//        $name = "<span class='template-name'>$name</span>";
+//        $preview = "<img src='$preview' class='template-thumb' />";
+//        $author = "<span class='template-author'>".$template['author']."</span>";
+//        
+//        $template['name'] = $preview.$name.$author;
+//    }
+//    
+//    return $template;
+        $params['file'] = 'blocks/template_changer/item.html';
+        $params['template'] = $template;
         
-        $template['name'] = $preview.$name.$author;
-    }
-    
-    return $template;
+        return fetch_template_file( $params );
 }
 
-//register_filter( 'template_selection', 'show_template_preview' );
+register_filter( 'template_selection_item', 'show_template_preview' );
 
 function show_total_videos ( $name ) {
     global $usercontent;

@@ -140,16 +140,16 @@ function _make_profile_item_link( $photo ) {
     
     global $cbphoto;
     /* Need to figure out a automated way to remove duplicate entries, for time time will work*/
-    $remove_query_variables = array( 'profile_item', 'type', 'profile_remove_item', 'callback_id' );
+    $remove_query_variables = array( 'profile_item', 'item_type', 'profile_remove_item', 'callback_id' );
     
     if ( userid() != $photo['userid'] ) {
         return false;
     }
     
     if ( !is_profile_item( $photo['photo_id'], 'p' ) ) {
-        $data = array('title' => lang('Make profile item'), 'link' => '?profile_item='.$photo['photo_id'].'&type=p', 'remove_query_variables' =>  $remove_query_variables );
+        $data = array('title' => lang('Make profile item'), 'link' => '?profile_item='.$photo['photo_id'].'&item_type=p', 'remove_query_variables' =>  $remove_query_variables );
     } else {
-        $data = array('title' => lang('Remove profile item'), 'link' => '?profile_remove_item='.$photo['photo_id'].'&type=p', 'remove_query_variables' => $remove_query_variables );
+        $data = array('title' => lang('Remove profile item'), 'link' => '?profile_remove_item='.$photo['photo_id'].'&item_type=p', 'remove_query_variables' => $remove_query_variables );
     }
 
     return $data;
@@ -163,7 +163,8 @@ function _make_profile_item_callback() {
     
     $make_item = mysql_clean( get('profile_item') );
     $remove_item = mysql_clean( get('profile_remove_item') );
-    $type = mysql_clean( get('type') );
+    $type = mysql_clean( get('item_type') );
+    
     if ( $make_item && is_numeric( $make_item) && $type ) {
         set_user_profile_item( $make_item, $type );
         return true;
@@ -295,4 +296,13 @@ $usercontent->object_group = 'comments';
 $usercontent->object = 'comments';
 $usercontent->get_callback = 'cb_get_user_channel_comments';
 $usercontent->add_new_content();
+
+//add_new_subscription( "video", array( lang("Video"), lang("Videos") ) );
+//add_subscription_template_file("subscriptions/blocks/video.html");
+//
+//add_new_subscription( "photo", array( lang("Photo"), lang("Photos") ) );
+//add_subscription_template_file("subscriptions/blocks/photo.html");
+
+add_new_subscription_type( "video", lang("Video"), lang("Videos"), "subscriptions/blocks/video.html" );
+add_new_subscription_type( "photo", lang("Photo"), lang("Photos"), "subscriptions/blocks/photo.html" );
 ?>

@@ -3993,10 +3993,6 @@ function end_where()
     unset($Cbucket->sql_where);
 }
 
-
-//include("functions_menu.php");
-
-
 /**
  * Format array into table fields
  * 
@@ -4041,6 +4037,29 @@ function tbl_fields($array, $tbl = false)
     if($the_fields) return $the_fields;
 }
 
+if ( !function_exists('cb_sql_table') ) {
+    /**
+     * Since we start using AS in our sql queries, it was getting
+     * more and more difficult to know how author has defined
+     * the table name. Using this will confirm that table will be 
+     * defined AS it's name provided in $table.
+     * 
+     * If author still wants to define table name differently, he
+     * can provide it in $as
+     * 
+     * @author Fawaz Tahir <fawaz.cb@gmail.com>
+     * @param string $table
+     * @param string $as
+     * @return string $from_query
+     */
+    function cb_sql_table( $table, $as = null ) {
+        if ( $table ) {
+            $from_query = tbl( $table )." AS ".( ( !is_null( $as ) and is_string( $as ) ) ? $as : $table );
+            return $from_query;
+        }
+        return false;
+    }
+}
 
 //Including videos functions
 include("functions_videos.php");
@@ -4066,4 +4085,6 @@ include("functions_templates.php");
 include("functions_players.php");
 include("functions_dashboard.php");
 include("functions_pm.php");
+include("functions_subscriptions.php");
+
 ?>

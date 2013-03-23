@@ -162,7 +162,7 @@ function fetch_template_file( $params ) {
         $output = "<!-- fetching layout/$file -->";
         $output .= Fetch( $file );
     } else if ( file_exists( $file ) ) {
-        $output = "<!-- fetching $file -->";
+        $output = "<!-- fetching ".str_replace( BASEDIR."/", "", $file )." -->";
         $output .= Fetch ( $file, false );
     } else if ( file_exists( STYLES_DIR . '/global/' . $file ) ) {
         $output = "<!-- fetching global/$file -->";
@@ -1949,7 +1949,7 @@ function upload_new_theme ( $theme_file ) {
         $messages[] = "<i class='icon-info-sign'></i> Confirming file extension ...";
         
         if ( "zip" != ( $extension ) ) {
-            $messages[] = "<strong>Error</strong>: Unknown format provided. Only <code>ZIP</code> file is allowed. ".$back_link;
+            $messages[] = "<i class='icon-remove-sign'></i> <strong>Error</strong>: Unknown format provided. Only <code>ZIP</code> file is allowed. ".$back_link;
         } else {
             $messages[] = "<i class='icon-ok-sign'></i> Extension confirmed ...";
             

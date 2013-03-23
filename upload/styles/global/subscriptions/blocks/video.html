@@ -1,0 +1,14 @@
+<li class="{$classes}">
+    <div class="name-avatar">
+        <img src="{avatar details=$object }" class="avatar img-polaroid" />
+        <span class="name"><a href="{$userquery->profile_link($object)}">{name($object)}</a> has uploaded a video</span>
+    </div>
+    <div class="subscription-details clearfix">
+        <a href="{videoLink($object)}" class="pull-left content-thumb"><img src="{get_thumb vdetails=$object}" /></a>
+        <a href="{videoLink($object)}" class="content-title">{$object.title}</a>
+        {$object.views|number_format} {lang code="views"}
+        <span>
+            {$object.description}
+        </span>
+    </div>
+</li>

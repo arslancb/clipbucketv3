@@ -1,0 +1,14 @@
+<li class="{$classes}">
+    <div class="name-avatar">
+        <img src="{avatar details=$object }" class="avatar img-polaroid" />
+        <span class="name"><a href="{$userquery->profile_link($object)}">{name($object)}</a> has added a new photo</span>
+    </div>
+    <div class="subscription-details clearfix">
+        <a href="{view_photo_link($object)}" class="pull-left content-thumb">{get_photo details=$object code='t' output='html' }</a>
+        <a href="{collection_links($object)}" class="content-title">{$object.collection_name}</a>
+        {$object.views|number_format} {lang code="views"}
+        <span>
+            {$object.photo_description}
+        </span>
+    </div>
+</li>
