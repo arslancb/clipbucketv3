@@ -278,47 +278,55 @@ class ClipBucket
 	 */
 	function set_the_template()
 	{
-		global $cbtpl,$myquery;
-		$template = $this->template;
-		
-            if ( !can_change_template() and FRONT_END ) {
-                //return false;
-            } 
-    
-		if(isset($_SESSION['the_template']) && $cbtpl->is_template($_SESSION['the_template']))
-			$template = $_SESSION['the_template'];
-		if($_GET['template'])
-		{
-			if(is_dir(STYLES_DIR.'/'.$_GET['template']) && $_GET['template'])
-				$template = $_GET['template'];
-		}
-		if(isset($_GET['set_the_template']) && $cbtpl->is_template($_GET['set_the_template']))
-			$template = $_SESSION['the_template'] = $_GET['set_the_template'];
-		if(!is_dir(STYLES_DIR.'/'.$template) || !$template)
-			$template = 'cbv2new';
-		if(!is_dir(STYLES_DIR.'/'.$template) || !$template)
-		{
-			$template = $cbtpl->get_any_template();		 
-		}
-		 
-		if(!is_dir(STYLES_DIR.'/'.$template) || !$template)
-			exit("Unable to find any template, please goto <a href='http://clip-bucket.com/no-template-found'><strong>ClipBucket Support!</strong></a>");
-		
-		
-		if( $_GET['set_template'] )
-		{
-			$myquery->set_template($template);
-		}
-		
-		$this->template_details = $cbtpl->get_template_details($template);
-		
-                //CHecking if there is any php file, include it like a BOSS!
-                //if($this->template_details['php_file'])
-                //    include($this->template_details['php_file']);
-                
-                $this->template = $template;
-                
-                return	 $this->template;
+            global $cbtpl,$myquery;
+
+            $template = $this->template;
+
+            $can_change = can_change_template();
+
+            if( isset($_SESSION['the_template']) && $cbtpl->is_template($_SESSION['the_template']) ) {
+                $template = $_SESSION['the_template'];
+            }
+
+            if( $_GET['template'] and $can_change )
+            {
+                if( is_dir(STYLES_DIR.'/'.$_GET['template']) && $_GET['template'] ) {
+                    $template = $_GET['template'];
+                }
+            }
+            
+            if( isset($_GET['set_the_template']) && $cbtpl->is_template($_GET['set_the_template']) and $can_change ) {
+                $template = $_SESSION['the_template'] = $_GET['set_the_template'];
+            }
+            
+            if( !is_dir(STYLES_DIR.'/'.$template) || !$template ) {
+              $template = 'cbv2new';
+            }
+            
+            if( !is_dir(STYLES_DIR.'/'.$template) || !$template )
+            {
+              $template = $cbtpl->get_any_template();		 
+            }
+
+            if( !is_dir(STYLES_DIR.'/'.$template) || !$template ) {
+              exit("Unable to find any template, please goto <a href='http://clip-bucket.com/no-template-found'><strong>ClipBucket Support!</strong></a>");
+            }
+
+
+            if( $_GET['set_template'] and has_access('admin_access') )
+            {
+              $myquery->set_template($template);
+            }
+            
+            $this->template_details = $cbtpl->get_template_details($template);
+
+            //CHecking if there is any php file, include it like a BOSS!
+            //if($this->template_details['php_file'])
+            //    include($this->template_details['php_file']);
+
+            $this->template = $template;
+
+            return	 $this->template;
 	}
 	
 	
