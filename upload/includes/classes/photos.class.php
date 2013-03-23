@@ -58,7 +58,7 @@ class CBPhotos {
         $this->set_photo_max_size();
         $this->thumb_dimensions = array(
           't'	=> array(
-                    'name' => lang('Thumb'),
+            'name' => lang('Thumb'),
             'width' => config('photo_thumb_width'),
             'height' => config('photo_thumb_height'),
             'crop' => (config('photo_crop') == 0 ? -1 : 5 ),
@@ -66,7 +66,7 @@ class CBPhotos {
             'sharpit' => true
           ),
           'm'	=> array(
-                    'name' => lang('Medium'),
+            'name' => lang('Medium'),
             'width' => config('photo_med_width'),
             'height' => config('photo_med_height'),
             'crop' => (config('photo_crop') == 0 ? -1 : 5 ),
@@ -74,7 +74,7 @@ class CBPhotos {
             'sharpit' => false
           ),
           'l'		=> array(
-                    'name' => lang('Large'),
+            'name' => lang('Large'),
             'width' => config('photo_lar_width'),
             'height' => 0,
             'crop' => -1,
@@ -82,7 +82,7 @@ class CBPhotos {
             'sharpit' => false
           ),
           'o'	=> array(
-                    'name' => lang('Original'),
+            'name' => lang('Original'),
             'width' => 0,
             'height' => 0,
             'crop' => -1,
@@ -92,6 +92,9 @@ class CBPhotos {
         );
         
         $this->default_thumb_dimensions = array( 't', 'm', 'l', 'o' );
+        
+        register_object('p','cbphoto');
+        register_object('photo','cbphoto');
     }
 
     /**
@@ -3175,7 +3178,11 @@ class CBPhotos {
 
         return true;
     }
-	
+    
+    function get( $pid, $cond = null ) {
+        return $this->get_photo( $pid, true );
+    }
+    
 }
 
 ?>
