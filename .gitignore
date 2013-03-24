@@ -1,3 +1,6 @@
 /upload/nbproject/private/
 /upload/nbproject
 /upload/cache
+
+/upload/files/photos
+!/upload/files/photos/no-photo_*.png

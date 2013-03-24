@@ -196,6 +196,7 @@ class user_content {
         $this->is_private = false;
         $this->content_type = null;
         $this->permissions = null;
+        $this->access = null;
     }
     
     /**
@@ -238,6 +239,14 @@ class user_content {
             'display' => $this->display_callback,
             'permissions' => $this->permissions
         );
+        
+        if ( is_string( $this->section ) ) {
+            $array['section'] = $this->section;
+        }
+        
+        if ( $this->access and is_string( $this->access ) ) {
+            $array['access'] = $this->access;
+        }
         
         if ( !$this->content_type ) {
             $groups[ $this->object_group ][ $complete_id ] = $array;
@@ -363,7 +372,7 @@ class user_content {
             $group = key( $groups );
         }
         
-        if ( $groups[ $group ] ) {            
+        if ( $groups[ $group ] ) {
             foreach( $groups[$group] as $key => $value ) {
                 $info = $this->__extract_key_details( $key );
                 $section_disbaled = false; 
@@ -641,6 +650,45 @@ class user_content {
         
         return $subtitle;
     }
+    
+    function get_current_object() {
+        $content = $this->__filter_user_object_content();
+        $index = $this->_build_index_object_content();
+        
+        if ( $content[ $index ] ) {
+            if ( $content[ $index ]['get'] ) {
+                return $content[ $index ];
+            } else {
+                $content_type = mysql_clean( get('content_type') );
+            
+                if ( !$content_type ) {
+                    $content_type = key( ( $content[$index] ) );
+                }
+
+                $content_type = $this->_build_index_object_content( $content_type );
+
+                if ( !$content_type ) {
+                    $content_type = key( $content[ $index ] );
+                }
+                
+                return $content[ $index ][ $content_type ];
+            }
+        }
+        
+        return false;
+    }
+    
+    function get_current_object_prop( $prop = 'group' ) {
+        $object = $this->get_current_object();
+        if ( $object ) {
+            return ( $object[ $prop ] ? $object[ $prop ] : false );
+        }
+        return false;
+    }
+    
+    function get_current_object_permissions() {
+        return $this->get_current_obeject_prop( 'permissions' );
+    }
 }
 
 /**
@@ -670,7 +718,70 @@ function display_other_objects_list() {
 /* STARTING USERCONTENT FUNCTIONS */
 
 /**
+ * This function returns the array of properties of object currently being viewed.
+ * 
+ * @author Fawaz Tahir <fawaz.cb@gmail.com>
+ * @global object $usercontent
+ * @return array|boolean Returns content array or boolean false
+ */
+
+function get_current_object() {
+    global $usercontent;
+    $content = $usercontent->__filter_user_object_content();
+    $index = $usercontent->_build_index_object_content();
+
+    if ( $content[ $index ] ) {
+        if ( $content[ $index ]['get'] ) {
+            return $content[ $index ];
+        } else {
+            $content_type = mysql_clean( get('content_type') );
+
+            if ( !$content_type ) {
+                $content_type = key( ( $content[$index] ) );
+            }
+
+            $content_type = $usercontent->_build_index_object_content( $content_type );
+
+            if ( !$content_type ) {
+                $content_type = key( $content[ $index ] );
+            }
+
+            return $content[ $index ][ $content_type ];
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Returns of value of given property name of current object being viewed
+ * 
+ * @author Fawaz Tahir <fawaz.cb@gmail.com>
+ * @param string $prop
+ * @return mix Return boolean false or value of property which could MIX
+ */
+function get_current_object_prop( $prop = 'group' ) {
+    $object = get_current_object();
+    if ( $object ) {
+        return ( $object[ $prop ] ? $object[ $prop ] : false );
+    }
+    return false;
+}
+
+/**
+ * Returns permissions of current object being viewed
+ * 
+ * @author Fawaz Tahir <fawaz.cb@gmail.com>
+ * @return mix
+ */
+function get_current_object_permissions() {
+    return get_current_object_prop( 'permissions' );
+}
+
+/**
  * This makes string readable
+ * 
+ * @author Fawaz Tahir <fawaz.cb@gmail.com>
  * @param string $name
  * @return string
  */
@@ -684,6 +795,7 @@ function usercontent_make_label( $name ) {
 /**
  * Creates link for user content
  * 
+ * @author Fawaz Tahir <fawaz.cb@gmail.com>
  * @param string $user Could be username or userid
  * @param string $group
  * @param string $object

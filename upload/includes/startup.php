@@ -229,6 +229,7 @@ $usercontent->section = true;
 $usercontent->content_type = 'uploaded';
 $usercontent->get_callback = 'cb_get_user_uploaded_videos';
 $usercontent->permissions = 'show_my_videos';
+$usercontent->access = 'view_videos';
 $usercontent->add_new_content();
 
 $usercontent->object_group = 'content';
@@ -237,6 +238,7 @@ $usercontent->section = true;
 $usercontent->content_type = 'favorite';
 $usercontent->get_callback = 'cb_get_user_favorite_videos';
 $usercontent->permissions = 'show_my_videos';
+$usercontent->access = 'view_videos';
 $usercontent->add_new_content();
 
 $usercontent->object_group = 'content';
