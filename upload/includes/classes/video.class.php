@@ -2307,8 +2307,12 @@ class CBvideo extends CBCategory {
      */
     function get_video_files($video) {
         global $db;
+        
 
         $file = $video['file_name'];
+        $version = $video['version'];
+        
+        
 
         //Checking if the system is old..
 
@@ -2331,6 +2335,44 @@ class CBvideo extends CBCategory {
                 $files['mobile'] = VIDEOS_URL . $folder . '/' . $file . '-m.mp4';
 
 
+            return $files;
+        }
+        
+        if($version < 3)
+        {
+            global $Cbucket;
+            
+            $files = array();
+            
+            if(is_array($Cbucket->custom_video_file_funcs))
+            foreach($Cbucket->custom_video_file_funcs as $func)
+            if(function_exists($func))
+            {
+                $func_returned = $func($video);
+                if($func_returned)
+                {
+                    $data = $func_returned;
+                    
+                    $files['flv'] = $data;
+                }
+                
+                $func_returned = $func($video,true);
+                if($func_returned)
+                {
+                    $data = $func_returned;
+                    
+                    $files['mp4'] = $data;
+                }
+                
+                $func_returned = $func($video,'mobile');
+                if($func_returned)
+                {
+                    $data = $func_returned;
+                    
+                    $files['mobile'] = $data;
+                }
+            }
+            
             return $files;
         }
 

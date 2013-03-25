@@ -228,6 +228,7 @@ function get_thumb($vdetails, $num = 'default', $multi = false, $count = false, 
             //Merging inputs
             $in_array = array(
                 'num' => $num,
+                'size' => $size,
                 'multi' => $multi,
                 'count' => $count,
                 'return_full_path' => $return_full_path,

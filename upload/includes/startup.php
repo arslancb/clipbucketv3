@@ -202,6 +202,8 @@ add_collection_manager_order( lang('Most Viewed'), tbl('collections.views desc')
 add_collection_manager_order( lang('Most Photos'), tbl('collections.total_objects desc') );
 add_collection_manager_order( lang('Last Updated'), tbl('collections.last_updated desc') );
 
+register_anchor_function( 'init_subscriptions_js', 'cb_head' );
+
 /**
  * Dashboard Function
  */

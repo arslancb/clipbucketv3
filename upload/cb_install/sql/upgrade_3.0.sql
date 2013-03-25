@@ -471,3 +471,7 @@ CREATE TABLE IF NOT EXISTS  `{tbl_prefix}subscriptions` (
 `last_activity` DATETIME NOT NULL ,
 `new_activity` INT NOT NULL
 ) ENGINE = MYISAM ;
+
+
+-- Adding Video version to make older videos comaptible with new system
+ALTER TABLE  `{tbl_prefix}video` ADD  `version` FLOAT( 5 ) NOT NULL DEFAULT  '2.6';

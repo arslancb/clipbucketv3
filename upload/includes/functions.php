@@ -4061,6 +4061,25 @@ if ( !function_exists('cb_sql_table') ) {
     }
 }
 
+
+/**
+ * when adding submenus for admin area, you have to 
+ * wrap the link in plug_url to make it work
+ * e.g if your plugin folder is my_plugin and you want
+ * to load file /my_file.php you will do this
+ * plug_url('my_file.php','my_plugin');
+ * plug_url('my_file_in_sub_Dir.php','my_plugin/sub_dir');
+ * 
+ * 
+ * @param STRING $file
+ * @param STRING $dir
+ * @author Arslan hassan <arslan.cb@gmail.com>
+ */
+function plug_url($file,$dir)
+{
+    return 'plugin.php?folder='.$dir.'&file='.$file;
+}
+
 //Including videos functions
 include("functions_videos.php");
 //Including Users Functions

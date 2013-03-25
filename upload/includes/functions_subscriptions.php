@@ -6,6 +6,11 @@ $cb_current_subscription = '';
 $cb_subscription_action_links = array();
 $cb_cache_user_subscriptions = array();
 
+
+function init_subscriptions_js() {
+    echo '<script type="text/javascript" src="'.JS_URL.'/functions_subscriptions.js"></script>';
+}
+
 /**
  * Gets fields of subscriptions table
  * 
@@ -83,21 +88,26 @@ function get_subscription_action_links() {
     return $cb_subscription_action_links;
 }
 
-function subscriptions_types_list( $subscribed_to = null ) {
+function subscriptions_types_list( $subscribed_to = null, $userid = null ) {
     $types = get_subscription_types();
+    
+    if ( is_null( $userid ) ) {
+        $userid = userid();
+    }
     
     if ( $types ) {
         $output = '';
         
         if ( !is_null( $subscribed_to ) ) {
-            $selected_content = get_subscribers_subscribed_content( $subscribed_to );
+            $selected_content = get_user_subscribed_content( $subscribed_to, $userid );
         }
         
         foreach ( $types as $type_id => $name ) {
-            
+            $checked = " unchecked subscribe-to-".$type_id;
             if ( $selected_content ) {
                 if ( isset( $selected_content[ $type_id ] ) ) {
                     $checked = " checked subscribed subscribed-".$type_id."";
+                    $checked_confirm = true;
                 }
             }
             
@@ -107,7 +117,7 @@ function subscriptions_types_list( $subscribed_to = null ) {
                 $title = $name[1];
             }
             
-            $output .= '<li class="subscription subscription-type '.$type_id.'-subscription'.$checked.'"><span class="subscription-check'.( $checked ? " checked" : " unchecked" ).'"></span> <a href="#'.$type_id.'" data-type="'.$type_id.'">'.$title.'</a></li>';
+            $output .= '<li class="subscription subscription-type '.$type_id.'-subscription'.$checked.'"> <span class="subscription-check'.( $checked_confirm ? " checked" : " unchecked" ).'"></span> <a href="#'.$type_id.'" data-user="'.$userid.'" data-type="'.$type_id.'" '.( $subscribed_to ? " data-owner = '".$subscribed_to."' " : "").' >'.$title.'</a></li>';
         }
         
         return $output;
@@ -192,21 +202,23 @@ function subscription_buttons( $to, $userid = null ) {
     }
     
     $params['file'] = 'subscriptions/blocks/subscribe_buttons.html';
-    $params['classes'] = 'subscription-button is-subscribed subscribed';
+    $params['classes'] = 'subscription-button';
     $params['id'] = 'unsubscribe-'.$to_user['userid'].'-button';
     $params['text'] = lang('Unsubscribe');
     $params['subscribe_to'] = name( $to_user ) ;    
-    $params['attributes'] = " data-page-id = '".THIS_PAGE."' data-parent-page-id = '".PARENT_PAGE."' ";
+    //$params['attributes'] = " data-page-id = '".THIS_PAGE."' data-parent-page-id = '".PARENT_PAGE."' ";
+    $params['attributes'] = "";
     
-    if ( $subscription_id = is_user_subscribed( $to, $userid ) ) {
-        $params['attributes'] .= " data-subscribe-button='true' data-is-subscribed='true' data-subscription-id='".$subscription_id['subscription_id']."' data-show-options='true' ";
-        $params['subscribed'] = true;
+    if ( $subscription_id = is_user_subscribed( $to_user['userid'], $userid ) ) {
+        $params['classes'] .= ' is-subscribed subscribed';
+        $params['attributes'] .= " data-subscribe-button='true' data-is-subscribed='true' data-subscription-id='".$subscription_id['subscription_id']."' data-show-options='true' data-subscribed-name='".name( $to_user )."' data-subscribed-to = '".$to_user['userid']."' ";
+        $params['is_subscribed'] = true;
     } else {
-        $params['attributes'] .= " data-subscribe-button='true' data-is-subscribed='false' data-do-initial-subscribe='true' data-do-popup='true' data-subscribe-to='".$to_user['userid']."' ";
-        $params['classes'] = 'subscription-button do-subscription not-subscribed';
+        $params['attributes'] .= " data-subscribe-button='true' data-is-subscribed='false' data-subscribe-name='".name( $to_user )."' data-do-initial-subscribe='true' data-do-popup='true' data-subscribe-to='".$to_user['userid']."' ";
+        $params['classes'] .= ' do-subscription not-subscribed';
         $params['id'] = 'subscribe-'.$to_user['userid'].'-button';
         $params['text'] = lang('Subscribe');
-        $params['subscribed'] = false;
+        $params['is_subscribed'] = false;
     }
         
     return fetch_template_file( $params );
@@ -320,19 +332,6 @@ function get_user_subscriptions( $userid = null, $limit = null, $order = "subscr
     } else {
         return false;
     }
-}
-
-function get_user_subscriptions_userid( $userid = null, $limit = 10, $order = "subscriptions.date_added desc", $cond = null ) {
-    $subscriptions = get_user_subscriptions( $userid, $limit, $order, $cond );
-    if ( $subscriptions ) {
-        foreach ( $subscriptions as $subscription ) {
-            $users[] = $subscription['userid'];
-        }
-        
-        return $users;
-    }
-    
-    return false;
 }
 
 function build_user_subscriptions_query ( $subscriptions, $type_id = null ) {
@@ -635,14 +634,17 @@ function display_user_subscriptions_content( $userid = null ) {
             $file_params = array( 'user' => $user );
 
             if( $object ) {
+                $random = RandomString( 10 );
                 $object['has_seen'] = $content['has_seen'];
                 $file_params['object'] = $object;
                 $file_params['file'] = $tpl_files[ $content['content_type'] ];
                 $file_params['classes'] = "subscription-block clearfix ".$content['content_type']."-subscription".( $key == $first_index ? " subscription-first-block first-".$content['content_type']."-block" : "" ).( $key == $last_index ? " subscription-last-block last-".$content['content_type']."-block" : "" );
-            } else {
+                $file_params['id'] = $content['content_owner_id']."-".$content['subscription_id']."-". $random ;
+                $file_params['attributes'] = " data-user = '".$content['content_owner_id']."' data-username = '".$content['username']."' data-name='".name( $content )."' data-subscription = '".$content['subscription_id']."' data-id = '".$random."' ";
+            }/* else {
                 $file_params['file'] = 'subscriptions/blocks/no_item.html';
                 $file_params['classes'] = "subscription-block clearfix object-not-found".( $key == $first_index ? " subscription-first-block " : "" ).( $key == $last_index ? " subscription-last-block" : "" );
-            }
+            }*/
             
             $subscription_content .= fetch_template_file( $file_params );
         }
@@ -767,5 +769,14 @@ function is_active_subscription( $subscription ) {
     }
     
     return false;
+}
+
+function subscription_md5( $toid, $userid = null ) {
+    if ( is_null( $userid ) ) {
+        $userid = userid();
+    }
+    
+    $md5 = $userid."~".$toid;
+    return md5( $md5 );
 }
 ?>

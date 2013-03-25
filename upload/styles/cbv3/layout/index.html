@@ -103,19 +103,7 @@
         <div class="cb-widget">
             {AD place=ad_300x600}
         </div>
-        {if has_sidebar('index-sidebar-right')}
-            {sidebar('index-sidebar-right')}
-        {else}
-            {$last_viewed=get_photos(['limit'=>'8','order'=>' last_viewed DESC'])}
-            {if $last_viewed}
-            <div class="cb-widget">
-                <h2 class="cb-widget-title">{lang code='Being Viewed Photos'}</h2>
-                {foreach $last_viewed as $photo}
-                    {include_template_file file="blocks/photo.html" photo=$photo display_method='index_sidebar'}
-                {/foreach}
-            </div>
-            {/if}        
-        {/if}
+
     </div>
     
     <div class="global-content-column pull-left">

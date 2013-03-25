@@ -41,6 +41,11 @@ if ( USE_PHOTO_TAGGING == true ) {
 }
 $Cbucket->addJS('jquery_plugs/jquery.Jcrop.js', 'edit_account' );
 
+$Cbucket->addJS('amplify/amplify.core.min.js' );
+$Cbucket->addJS('amplify/amplify.request.min.js' );
+$Cbucket->addJS('amplify/amplify.store.min.js' );
+$Cbucket->addJS('amplify_requests.js' );
+
 //Assigning JS Files
 Assign('jsArray',$Cbucket->JSArray);
 //Assigning Module Files

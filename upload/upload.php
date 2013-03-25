@@ -57,12 +57,7 @@ if(has_access('allow_video_upload',false,$verify_logged_user))
 	
 	//Assigning Form Name [RECOMMEND for submitting purpose]
 	Assign('upload_form_name','UploadForm');
-		   
-	//Adding Uploading JS Files
-	$Cbucket->add_js('swfupload/swfupload.js','upload');
-	$Cbucket->add_js('swfupload/plugins/swfupload.queue.js','upload');
-	$Cbucket->add_js('swfupload/plugins/handlers.js','upload');
-	$Cbucket->add_js('swfupload/plugins/fileprogress.js','upload');
+	
 }else
 {
 	$userquery->logincheck('allow_video_upload',true);

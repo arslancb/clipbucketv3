@@ -88,7 +88,19 @@
         }
     });
     
-    
+    //Users
+    amplify.request.define( "users", "ajax", {
+        url: ajaxURL+"/users.php",
+        type: "POST",
+        dataType: "json",
+        decoder: function( data, status, xhr, success, error ) {
+            if ( status === "success" ) {
+                success( data );
+            } else {
+                error( data );
+            }
+        }
+    });
 </script>
 
 
