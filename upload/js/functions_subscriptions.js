@@ -108,7 +108,6 @@ function attach_subscription_options_list( __subscribe_button ) {
                                 var options_list = $('#'+__subscribe_button.data('subscribed-to')+'-'+__subscribe_button.data('subscription-id')+'-list');
                                 options_list.css({
                                     position : 'absolute',
-                                    background : 'white'
                                 });
                                 
                                 list_positions = get_subscription_options_container_positions( ( d.position ), __subscribe_button, options_list  );
@@ -119,15 +118,45 @@ function attach_subscription_options_list( __subscribe_button ) {
                                     'zIndex' : '9999'
                                 });
                                 
+                                options_list.find('li.subscription-type').on( 'click', function( event ) {
+                                    //Prevent Default Action
+                                    event.preventDefault();
+                                    
+                                    var _li = $( this ), data_ele = _li.find('a'), data = {};
+                                    
+                                    data['owner'] = data_ele.data('owner');
+                                    data['user'] = data_ele.data('user');
+                                    data['type'] = data_ele.data('type');
+                                    data['mode'] = 'update_subscription_option';
+                                        
+                                    if ( _li.hasClass('checked') ) {
+                                        // Do unchecked
+                                        data['action'] = 'uncheck';
+                                        _li.removeClass('checked').addClass('unchecked');
+                                        _li.find('.subscription-check').removeClass('checked').addClass('unchecked');
+                                    } else {
+                                        // Do check
+                                        data['action'] = 'check';
+                                        _li.removeClass('unchecked').addClass('checked');
+                                        _li.find('.subscription-check').removeClass('unchecked').addClass('checked');
+                                    }
+                                    
+                                    amplify.request( 'users', data, function( r ) {
+                                        if ( r.error ) {
+                                            displayError( r.error );
+                                        }
+                                    })
+                                });
+                                
                                 options_list.on( 'mouseleave', function() {
                                     options_list.hide();
                                     __subscribe_button.removeClass('subscription-options-opened')
-                                } )
+                                });
                             }
                             
-                            if( d.err )
+                            if( d.error )
                             {
-                                displayError( d.err );
+                                displayError( d.error );
                             }
                         });
                         

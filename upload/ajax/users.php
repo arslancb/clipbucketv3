@@ -36,7 +36,7 @@ switch ($mode) {
         $list = subscriptions_types_list( post('user') );
         
         $params['file'] = ( 'subscriptions/options_list.html' );
-        $params['classes'] = 'subscriptions-options options-list page-'.post('page').'-list parent-'.post('parent').'-list '.post('id')." ".$position;
+        $params['classes'] = 'subscriptions-options options-list '.post('id').' option-position-'.$position;
         $params['id'] = post('user').'-'.post('subscription').'-list';
         $params['subscribed_content_list'] = $list;
         $params['name'] = post('name');
@@ -51,7 +51,12 @@ switch ($mode) {
         
     }
     break;
-
+    
+    case "update_subscription_option": {
+        echo json_encode( $_POST );
+    }
+    break;
+    
     default:
         exit(json_encode(array('err' => lang('Invalid request'))));
 }

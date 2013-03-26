@@ -9,6 +9,8 @@ $cb_cache_user_subscriptions = array();
 
 function init_subscriptions_js() {
     echo '<script type="text/javascript" src="'.JS_URL.'/functions_subscriptions.js"></script>';
+    echo "\n";
+    echo "<link href='".BASEURL."/styles/global/subscriptions/subscriptions.css' rel='stylesheet' type='text/css' />";
 }
 
 /**
@@ -103,10 +105,10 @@ function subscriptions_types_list( $subscribed_to = null, $userid = null ) {
         }
         
         foreach ( $types as $type_id => $name ) {
-            $checked = " unchecked subscribe-to-".$type_id;
+            $checked = " unchecked";
             if ( $selected_content ) {
                 if ( isset( $selected_content[ $type_id ] ) ) {
-                    $checked = " checked subscribed subscribed-".$type_id."";
+                    $checked = " checked";
                     $checked_confirm = true;
                 }
             }
@@ -117,7 +119,7 @@ function subscriptions_types_list( $subscribed_to = null, $userid = null ) {
                 $title = $name[1];
             }
             
-            $output .= '<li class="subscription subscription-type '.$type_id.'-subscription'.$checked.'"> <span class="subscription-check'.( $checked_confirm ? " checked" : " unchecked" ).'"></span> <a href="#'.$type_id.'" data-user="'.$userid.'" data-type="'.$type_id.'" '.( $subscribed_to ? " data-owner = '".$subscribed_to."' " : "").' >'.$title.'</a></li>';
+            $output .= '<li class="subscription subscription-type '.$type_id.'-subscription'.$checked.'"><a href="#'.$type_id.'" data-user="'.$userid.'" data-type="'.$type_id.'" '.( $subscribed_to ? " data-owner = '".$subscribed_to."' " : "").' ><span class="subscription-check'.( $checked_confirm ? " checked" : " unchecked" ).'"><i class="subscription-type-checked icon-ok"></i></span> '.$title.'</a></li>';
         }
         
         return $output;
@@ -196,7 +198,7 @@ function subscription_buttons( $to, $userid = null ) {
         // return
         return false;
     }
-    
+        
     if ( get_user_profile_field( $to_user['userid'], 'allow_subscription' ) == 'no' ) {
         return false;
     }
