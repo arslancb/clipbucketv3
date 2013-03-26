@@ -8,7 +8,7 @@
 
 	$BDTYPE = 'mysql';
 	//Database Host
-	$DBHOST = 'localhost';
+	$DBHOST = '192.168.15.150';
 	//Database Name
 	$DBNAME = 'clipbucket_tune';
 	//Database Username
