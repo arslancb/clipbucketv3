@@ -4075,9 +4075,12 @@ if ( !function_exists('cb_sql_table') ) {
  * @param STRING $dir
  * @author Arslan hassan <arslan.cb@gmail.com>
  */
-function plug_url($file,$dir)
+function plug_url($file,$dir,$admin_base=false)
 {
-    return 'plugin.php?folder='.$dir.'&file='.$file;
+    $url = 'plugin.php?folder='.$dir.'&file='.$file;
+    if($admin_base)
+        $url = ADMIN_BASEURL.'/'.$url;
+    return $url;
 }
 
 //Including videos functions
