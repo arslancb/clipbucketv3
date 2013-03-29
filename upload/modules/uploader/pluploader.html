@@ -58,6 +58,10 @@
     // Custom example logic
     $(function() {
     
+        var plSwfUrl = '/plupload/js/plupload.flash.swf';
+        var plFileUploader ='{$baseurl}/actions/file_uploader.php?upload=yes';
+        
+        plFileUploader = 'http://lahore.clipbucket.com/multiservers/v3/actions/file_uploader.php?upload=yes';
         
         var filenames = Array();
         
@@ -67,8 +71,8 @@
             container : 'upload-form-container',
             max_file_size : '1000mb',
             drop_element : 'upload-files-dropable',
-            url : '{$baseurl}/actions/file_uploader.php?upload=yes',
-            flash_swf_url : '/plupload/js/plupload.flash.swf',
+            url : plFileUploader,
+            flash_swf_url : plSwfUrl,
             multipart_params : {
                 file_directory : 'value'
             },

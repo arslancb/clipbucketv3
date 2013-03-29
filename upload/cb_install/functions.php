@@ -223,7 +223,6 @@
 			'images',
 			'images/avatars',
 			'images/backgrounds',
-			'images/category_thumbs',
 			'images/collection_thumbs',
 			'images/groups_thumbs',
 			'includes',

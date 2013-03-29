@@ -804,22 +804,34 @@ class CBvideo extends CBCategory {
             if (!empty($cond))
                 $cond .= " AND ";
 
-            $meta_query = $this->create_meta_query();
+            //$meta_query = $this->create_meta_query();
+            
+            $fields_arr = array(
+                'video' => get_video_fields(),
+                'users' => get_user_fields()
+            );
+            
+            $fields = tbl_fields($fields_arr);
+            
+            $query = " SELECT ".$fields." FROM ".tbl('video')." AS video ";
+            $query .= " LEFT JOIN ".tbl('users')." AS users ";
+            $query .= " ON video.userid = users.userid ";
+            
+            $limit_query =  "";
+            $order_query = "";
+            
+            if($limit)
+                $limit_query = " LIMIT ".$limit;
+            if($order)
+                $order_query = " ORDER BY ".$order;
+            
+            $query .= $order_query;
+            $query .= $limit_query;
+            
+            $result = db_select($query);
+            
+            
 
-            $result = $db->select(tbl('video')
-            . ' LEFT JOIN ' . tbl('users') . ' ON '
-            . tbl('video.userid') . ' = ' . tbl('users.userid')
-            . ' LEFT JOIN ' . tbl('slugs') . ' ON '
-            . tbl('video.slug_id') . ' = ' . tbl('slugs.slug_id')
-            . ' LEFT JOIN ' . tbl('video_meta') . ' ON '
-            . tbl('video.videoid') . ' = ' . tbl('video_meta.videoid')
-            , tbl('video.*' . $ufieldq . ',slugs.*') . ',' 
-            . $meta_query, $cond . " " 
-            . tbl("video.userid") . " = " 
-            . tbl("users.userid") . " GROUP BY " 
-            . tbl('video.videoid'), $limit, $order);
-
-            $db->db_query;
         }
 
 
@@ -2173,7 +2185,10 @@ class CBvideo extends CBCategory {
         }
 
         if ($update_db)
-            $this->update_meta($video['videoid'], 'thumbs', '|no_mc|' . json_encode($new_thumbs));
+        {
+            //$this->update_meta($video['videoid'], 'thumbs', '|no_mc|' . json_encode($new_thumbs));
+            $this->update_extras($video['videoid'], 'thumbs', ($new_thumbs));
+        }
 
         return $new_thumbs;
     }
@@ -2197,6 +2212,30 @@ class CBvideo extends CBCategory {
         else {
             $db->update(tbl('video_meta'), array('meta_value'), array($val), "meta_name='$name' AND videoid='$vid' ");
         }
+    }
+    
+    
+    /**
+     * Function used to update video extras for extended data 
+     * 
+     * read more about metas in our docs
+     * 
+     * @todo : write docs for metas
+     * @author : Arslan
+     * @param INT videoid
+     * @param STRING meta_name
+     * @param STRING meta_value
+     */
+    function update_extras($vid, $name, $val) 
+    {
+        $vid = mysql_clean($vid);
+        
+        $extras = $this->get_video_extras($vid);
+        $extras[$name] = $val;
+        
+        $encoded = json_encode($extras);
+        
+        db_update(tbl('video'), array('extras'=>$extras)," videoid='$vid' ");
     }
 
     /**
@@ -2233,6 +2272,8 @@ class CBvideo extends CBCategory {
         }
     }
 
+    
+    
     /**
      * Function remove video metas
      * 
@@ -2293,11 +2334,49 @@ class CBvideo extends CBCategory {
                     $query .=',';
                 }
 
-                $query .= " CONCAT (if(meta_name='$meta',meta_value,meta_value)) AS '$meta' ";
+                $query .= " CONCAT (if(meta_name='$meta',meta_value,NULL)) AS '$meta' ";
             }
         }
 
         return $query;
+    }
+    
+    /** 
+     * function get video specifi field
+     * 
+     * @param INT videoid
+     * @param STRING extras
+     * @author Arslan Hassna <arslan.cb@gmail.com>
+     * return $extras
+     */
+    
+    function get_video_field($vid,$field)
+    {
+        $query = " SELECT ".$field." FROM ".tbl('videos');
+        $query .=" WHERE videoid='$vid '";
+        $query .= " LIMIT 1 ";
+        
+        $result = db_select($query);
+        $extras = $result[0][$field];
+    }
+    
+    
+    /**
+     * function get video extras
+     * 
+     * @param INT videoid
+     */
+    function get_video_extras($vid,$extras=NULL)
+    {
+        if(!$extras)
+        {
+            $extras = $this->get_video_field($vid,'extras');
+        }
+        
+        $extras = json_decode($extras,true);        
+        $extras = apply_filters($extras, 'video_extras');
+        
+        return $extras;
     }
 
     /**

@@ -110,10 +110,15 @@ function duration($time, $pad = true) {
  * 
  */
 function get_thumb($vdetails, $num = 'default', $multi = false, $count = false, $return_full_path = true, $return_big = true, $size = NULL) {
-    global $db, $Cbucket, $myquery;
+    global $db, $Cbucket, $myquery,$cbvid;
 
+    
     if (!is_array($vdetails))
         $vdetails = $myquery->get_video_details($vdetails);
+    
+    $thumbs = $cbvid->get_video_extras($vdetails['videoid'],$vdetails['extras']);
+    $vdetails['thumbs'] = $thumbs['thumbs'];
+    
     if ($vdetails['thumbs']) {
         if ($return_full_path) {
             $folder = '';
@@ -452,21 +457,26 @@ function video_link($vdetails, $type = NULL) {
             case 4: {
                     if ($vdetails['slug']) {
                         $link = BASEURL . '/video/'
-                                . $vdetails['slug']
-                                . $plist;
+                        . $vdetails['slug']
+                        . $plist;
                     } else {
+                        
                         //check if slug was recently added...
+                        if(!$vdetails['slug'])
                         $slug_arr = get_slug($vdetails['videoid'], 'v');
+                        else
+                            $slug_arr = $vdetails;
 
                         if (!$slug_arr) {
                             $slug_arr = add_slug(slug($vdetails['title']), $vdetails['videoid'], 'v');
-                            $db->update(tbl('video'), array('slug_id'), array($slug_arr['id'])
-                                    , "videoid='" . $vdetails['videoid'] . "'");
+                            
+                            $db->update(tbl('video'), array('slug_id','slug'), array($slug_arr['id'],$slug_arr['slug'])
+                            , "videoid='" . $vdetails['videoid'] . "'");
                         }
 
                         $link = BASEURL . '/video/'
-                                . $slug_arr['slug']
-                                . $plist;
+                        . $slug_arr['slug']
+                        . $plist;
                     }
                 }
                 break;
@@ -1485,4 +1495,26 @@ function is_valid_broadcast($opt)
         return true;
     else
         return false;
+}
+
+
+
+/**
+ * get user basic fields
+ * 
+ * @return ARRAY list of basic fields for users table
+ */
+function get_video_fields($extra_fields=NULL)
+{
+    $fields = array(
+            'videoid', 'title', 'description', 'tags', 'category',
+            'rating', 'date_added', 'broadcast', 'file_server_path', 'files_thumbs_path',
+            'file_thumbs_count', 'has_hd', 'has_mobile', 'file_directory', 'duration', 'views'
+            ,'rated_by', 'file_name', 'default_thumb', 'videokey','extras','slug','slug_id'
+        );
+
+    if ($extra_fields)
+        $fields = array_merge($fields, $extra_fields);
+
+    return $fields;
 }

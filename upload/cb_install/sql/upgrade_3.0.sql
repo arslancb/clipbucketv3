@@ -475,3 +475,7 @@ CREATE TABLE IF NOT EXISTS  `{tbl_prefix}subscriptions` (
 
 -- Adding Video version to make older videos comaptible with new system
 ALTER TABLE  `{tbl_prefix}video` ADD  `version` FLOAT( 5 ) NOT NULL DEFAULT  '2.6';
+
+-- @Author Arslan
+-- Adding Slug field for videos to minimize the sql load
+ALTER TABLE  `{tbl_prefix}video` ADD  `slug` MEDIUMTEXT NOT NULL AFTER  `slug_id`;
