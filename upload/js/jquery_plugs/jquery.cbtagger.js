@@ -116,7 +116,7 @@
                 }
                 
 			if ( options.addButton == true ) {
-				options.buttonID = options.buttonID ? option.buttonID : getID('tagging');
+				options.buttonID = ( options.buttonID != null ) ? options.buttonID : getID('tagging');
 				if ( options.allowTagging == 'yes' ) {
 					if ( orgParentTag == 'a' && options.buttonWrapper == null ) {
 						buttonWrapper = orgParent.parent();

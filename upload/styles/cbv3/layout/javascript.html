@@ -270,12 +270,12 @@
             if($(this).find('input[type=checkbox]').is(':checked'))
             {
                 $(this).parents('.manager-list')
-                .find('.table input[type=checkbox]')
+                .find('.table input[type=checkbox].check-item')
                 .prop("checked",true);
             }else
             {
                 $(this).parents('.manager-list')
-                .find('.table input[type=checkbox]')
+                .find('.table input[type=checkbox].check-item')
                 .prop("checked",false);
             }
         });

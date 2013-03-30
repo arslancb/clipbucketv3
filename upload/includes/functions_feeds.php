@@ -521,4 +521,18 @@ function get_notify_icon($notify)
     return $actions[$action];
 }
 
+/**
+ * This is an alias function to $cbfeeds method add_object_cache.
+ * Author that is Arslan Hassan <arslan.cb@gmail.com>
+ * 
+ * @author Fawaz Tahir <fawaz.cb@gmail.com>
+ * @param int $id
+ * @param string $type
+ * @param string $content
+ * @return int cached object id
+ */
+function add_object_cache( $id, $type, $content ) {
+    global $cbfeeds;
+    return $cbfeeds->add_object_cache( $id, $type, $content );
+}
 ?>

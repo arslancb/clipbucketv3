@@ -1,0 +1,91 @@
+/* 
+    Document   : subscriptions
+    Created on : Mar 26, 2013, 2:51:59 PM
+    Author     : Fawaz
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+.subscriptions-options {
+    background: white;
+    border: 1px solid #0066ff;
+    min-width: 150px;
+    box-sizing : border-box;
+    padding: 1px;
+}
+
+.subscriptions-options .subscription-type {
+    padding: 8px 10px;
+    cursor : pointer;
+}
+
+.subscriptions-options .subscription-type:hover {
+    background: #f8f8f8;
+}
+
+.subscriptions-options .nav.nav-list {
+    padding: 0px;
+}
+
+.subscriptions-options .subscription-type input[type=checkbox].checkbox-css3 + label {
+    padding: 8px;
+    margin-bottom: 0px;
+    vertical-align: top;
+    box-shadow: none;
+    border-radius: 0px;
+}
+
+#subscriptions-manager th, #subscriptions-manager td {
+    vertical-align: middle;
+}
+
+.table th.subscription-type, .table td.subscription-type {
+    text-align: center;
+}
+
+#subscriptions-manager .avatar {
+    max-width : 60px;
+}
+
+#subscriptions-manager .name {
+    line-height: 60px;
+    margin-left: 68px;
+}
+
+/* CSS3 Checkboxes */
+input[type=checkbox].checkbox-css3 { display:none;  }
+input[type=checkbox].checkbox-css3 + label { cursor: pointer; display: inline-block; background: #f8f8f8; padding:10px; border:1px solid #aaa; border-radius: 2px; box-shadow: 0px 1px 0px 0px rgba(0,0,0,0.1); vertical-align: middle; -webkit-transition: all 0.2s ease-out; -moz-transition: all 0.2s ease-out; -o-transition: all 0.2s ease-out;}
+input[type=checkbox].checkbox-css3:checked + label, input[type=checkbox].checbox-css3:checked + label:hover { background: #ddd url("../images/check-small.png") no-repeat center; background-size: 70%; }
+input[type=checkbox].checkbox-css3:checked + label:hover { box-shadow: 0px 1px 0px 0px rgba(0,0,0,0.2); }
+input[type=checkbox].checkbox-css3 + label:hover { background-color: #e8e8e8;  }
+input[type=checkbox].checkbox-css3 + label:active, input[type=checkbox].checkbox-css3:checked + label:active { box-shadow: inset 0px 1px 0px 0px rgba(0,0,0,0.1)  }
+input[type=checkbox][disabled=disabled].checkbox-css3 + label { opacity : 0.5 }
+
+/* Table Strucate using other Elements */
+.table-structure {
+    display: table;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.table-structure .thead, .table-structure .tbody {
+    display: table-header-group;
+    vertical-align: middle;
+    border-color: inherit
+}
+
+.table-structure .tbody {
+    display : table-row-group;
+}
+
+.table-structure .table-row, .table-structure ul {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    display: table-row;
+}
+
+.table-structure .table-row .table-cell, .table-structure ul li {
+    display: table-cell;
+    background: #f8f8f8;
+}

@@ -1,0 +1,70 @@
+{include_template_file file="blocks/account_left.html"}
+
+<div class="account-right">
+    <div class="account-heading">
+        <h2 >{lang code="Manage Subscriptions"} (<span id="playlists_count">{$user.total_subscriptions|number_format}</span>)</h2>
+    </div>
+    
+    <div class="manager-list">
+        <div class="controller scrolltoFixed white-grad">
+            <div class="buttons">
+                
+                <div class="btn-toolbar">
+                    <div class="btn-group">
+                        <label class="btn check-all "><input type="checkbox"></label>
+                    </div>
+                    <div class="btn-group">
+                        <a class="btn btn-danger" onclick="return false;">Delete</a>
+                    </div>
+                </div>
+                
+                <div class="right-button">
+                    <div class="btn-group">
+                        <button class="btn btn-primary">{current_object_order(manage_subscriptions)}</button>
+                        <button class="btn dropdown-toggle btn-primary" data-toggle="dropdown">
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu pull-right">
+                            {display_manager_orders(manage_subscriptions)}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <form id="subscriptions-manager" method="post">
+        {if $subscriptions}
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th class="text-center">#</th>
+                        <th>Subscription</th>
+                        {display_subscription_types(th)}
+                        <th width="140" class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach $subscriptions as $subscription}
+                    <tr>
+                        <td class="text-center">
+                            <input type="checkbox" class="check-item checkbox-css3" name="check_subscription[]" value="{$subscription.subscription_id}" id="check-subscription-{$subscription.subscription_id}" />
+                            <label for="check-subscription-{$subscription.subscription_id}"></label></td>
+                        <td>
+                            <a href="{$userquery->profile_link($subscription)}" class="name-avatar"><img src="{avatar details=$subscription}" class="avatar" /> <span class="name">{name($subscription)}</span></a>
+                        </td>
+                        {display_user_subscribed_content($subscription,td)}
+                        <td class="text-center">
+                            {subscription_buttons($subscription)}
+                        </td>
+                    </tr>
+                    {/foreach}
+                </tbody>
+            </table>
+        {/if}
+        
+        {if !$subscriptions}
+            <p class="alert alert-large">{lang code="No subscriptions found"}</p>
+        {/if}
+        </form>
+    </div>
+</div>
