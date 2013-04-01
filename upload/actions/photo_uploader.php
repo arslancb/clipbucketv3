@@ -8,8 +8,12 @@ include('../includes/config.inc.php');
 
 //die('{"jsonrpc" : "2.0", "error" : {"code": 100, "message": "Failed to open temp directory."}, "id" : "id"}');
 
-if ( $_REQUEST['upload'] == 'yes' ) {
+if ( $_REQUEST['mode'] == 'upload' || !$_REQUEST['mode'] ) {
     $mode = 'upload_photo';
+}
+
+if ( $_REQUEST['mode'] == 'process' ) {
+    $mode = 'processing_photo';
 }
 
 if($_FILES['photoUpload'])
@@ -46,29 +50,61 @@ switch($mode)
 		echo json_encode(array("form"=>$form));	
 	}
 	break;
+  
+    case "processing_photo": {
+        $photo_id = $_REQUEST['id'];
+        
+        $cbphoto->generate_photos( $photo_id );
+        
+        if ( !error() ) {
+            $image_url = get_image_url( $photo_id, 'l' );
+            echo json_encode( array( 'success' => true, 'photo_id' => $photo_id, 'photo_preview' => $image_url ) );
+        } else {
+            echo json_encode( array( 'error' => error() ) );
+        }
+    }
+    break;
+
 	case "insert_photo":
 	{
-		$_POST['photo_title'] = genTags(str_replace(array('_','-'),' ',$_POST['photo_title']));
+		/* $_POST['photo_title'] = genTags(str_replace(array('_','-'),' ',$_POST['photo_title']));
 		$_POST['photo_description'] = genTags(str_replace(array('_','-'),' ',$_POST['photo_description']));
 		$_POST['photo_tags'] = genTags(str_replace(array(' ','_','-'),', ',$_POST['photo_tags']));
 		$_POST['server_url'] = mysql_clean($_POST['server_url']);
-		$_POST['folder'] = str_replace('..','',mysql_clean($_POST['folder']));
+		$_POST['folder'] = str_replace('..','',mysql_clean($_POST['folder'])); */
 		
-		$insert_id = $cbphoto->insert_photo();
-		
-		if(error())
-			$response['error'] = error('single');
-		if(msg())
-		{
-			$response['success'] = msg('single');
-			$response['photoID'] = $insert_id;
-			
-			$details = $cbphoto->get_photo($insert_id);
-			$params = array("details"=>$details,"size"=>"l");
-			$response['photoPreview'] = get_photo($params);	
-		}
-		
-		echo json_encode($response);
+            $name = mysql_clean( $_POST['title'] );
+            $filename = cb_filename();
+            $extension = GetExt( $name );
+            $name = str_replace( '.'.$extension, '', $name );
+            $photo_dir = createDataFolders( PHOTOS_DIR );
+            
+            $post_data = array(
+                'photo_title' => $name,
+                'photo_description' => $name,
+                'photo_tags' => genTags( str_replace( array( ' ','_','-' ),', ', $name ) ),
+                'filename' => $filename,
+                'folder' => $photo_dir,
+                'collection_id' => mysql_clean( $_POST['collection'] ),
+                'ext' => $extension
+            );
+            
+            $insert_id = $cbphoto->insert_photo( $post_data );
+
+            if( error() ) {
+                $response['error'] = error();
+            }
+            
+            if(msg())
+            {
+                $response['success'] = true;
+                $response['id'] = $insert_id;
+                $response['file'] = $filename;
+                $response['extension'] = $extension;
+                $response['file_directory'] = $photo_dir;
+            }
+
+            echo json_encode( $response );
 	}
 	break;
 	case "update_photo":
@@ -180,7 +216,7 @@ switch($mode)
         header("Pragma: no-cache");
         
         $targetDir = PHOTOS_DIR;
-        $date_folders = createDataFolders();
+        $date_folders = $_REQUEST['file_directory'];
         $targetDir .= '/'.$date_folders;
                 
         $cleanupTargetDir = true; // Remove old files
@@ -283,13 +319,13 @@ switch($mode)
                 rename("{$filePath}.part", $filePath);
             }
             
-            $file_name = cb_filename(); $extension = GetExt( $fileName );
+            $file_name = $_REQUEST['filename']; $extension = $_REQUEST['extension'];
             $filename = $file_name.'.'.$extension;
-            $path = PHOTOS_DIR.'/'.$date_folders.'/'.$filename;
+            $path = $targetDir.'/'.$filename;
             
             rename( $filePath, $path );
             
-            echo json_encode( array('success' => 'yes', 'file_directory' => $date_folders, 'filename' => $file_name, 'extension' => $extension ) );
+            echo json_encode( array( 'success' => 'yes', 'file_directory' => $date_folders, 'filename' => $file_name, 'extension' => $extension ) );
     }
     break;
     

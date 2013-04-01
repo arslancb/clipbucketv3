@@ -759,7 +759,8 @@ class CBPhotos {
 
         $pid = $photo['photo_id'];
 		$date_dir  = get_photo_date_folder( $photo );
-        $files = $this->get_image_file( $pid, 't', TRUE, NULL, FALSE, TRUE );
+        $files = $this->get_image_file( $pid, 'all', TRUE, NULL, FALSE, TRUE );
+
         if ( !empty( $files ) ) {
             foreach ( $files as $file ) {
                 $file_dir = PHOTOS_DIR . "/" . $date_dir.'/' . $file;
@@ -897,14 +898,16 @@ class CBPhotos {
             $p = $this->get_photo( $array );
         else
             $p = $array;
-
+        
+        if ( !$p ) {
+            e( lang('Photo does not exist') );
+            return false;
+        }
+        
         $filename = $p['filename'];
         $extension = $p['ext'];
-		$date_dir = get_photo_date_folder( $p );
-		$path = PHOTOS_DIR . "/".$date_dir.'/';
-        /* Updating resizes code. From static, we'll load code, dimensions, watermark and sharpit from thumb_dimensions array */
-//        apply_filters( null, 'photo_dimensions' );
-//        $dimensions = $this->thumb_dimensions;
+        $date_dir = get_photo_date_folder( $p );
+        $path = PHOTOS_DIR . "/".$date_dir.'/';
         $dimensions = get_photo_dimensions( true );
         
         $img = new CB_Resizer( $path.$filename.".".$extension );
@@ -932,18 +935,7 @@ class CBPhotos {
             // Lets save it
             $img->save();
         }
-//        $this->createThumb( $path . $filename . "." . $extension, $path . $filename . "_o." . $extension, $extension );
-//        $this->createThumb( $path . $filename . "." . $extension, $path . $filename . "_t." . $extension, $extension, $this->thumb_width, $this->thumb_height );
-//        $this->createThumb( $path . $filename . "." . $extension, $path . $filename . "_m." . $extension, $extension, $this->mid_width, $this->mid_height );
-//        $this->createThumb( $path . $filename . "." . $extension, $path . $filename . "_l." . $extension, $extension, $this->lar_width );
-//
-//        $should_watermark = config( 'watermark_photo' );
-//
-//        if ( !empty( $should_watermark ) && $should_watermark == 1 ) {
-//            $this->watermark_image( $path . $filename . "_l." . $extension, $path . $filename . "_l." . $extension );
-//            $this->watermark_image( $path . $filename . "_o." . $extension, $path . $filename . "_o." . $extension );
-//        }
-
+        
         /* GETTING DETAILS OF IMAGES AND STORING THEM IN DB */
         $this->update_image_details( $p );
     }
@@ -1380,18 +1372,18 @@ class CBPhotos {
 			/*
 			 * EXIF should be added here
 			*/
-			insert_exif_data( $photo );
+			/* insert_exif_data( $photo ); */
 			
 			/*
 			 * Extract colors
 			 */
-			insert_photo_colors( $photo );
+			/* insert_photo_colors( $photo ); */
 			
-            if ( !$array['server_url'] || $array['server_url'] == 'undefined' )
-                $this->generate_photos( $photo );
+            /* if ( !$array['server_url'] || $array['server_url'] == 'undefined' )
+                $this->generate_photos( $photo );*/
 
 
-            $eh->flush();
+            //$eh->flush();
             e( sprintf( lang( "photo_is_saved_now" ), $photo['photo_title'] ), "m" );
             $db->update( tbl( "users" ), array("total_photos"), array("|f|total_photos+1"), " userid='" . $userid . "'" );
 
