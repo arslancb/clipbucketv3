@@ -1508,11 +1508,16 @@ function add_object_manager_order($title, $order, $type = 'video')
     {
         return false;
     }
-
+    
+    $seo_id = SEO(strtolower($title));
+    $random_id = RandomString(5).time();
+    
     $order_array = array(
         'title' => $title,
         'order' => $order,
-        'id' => $type . '-' . SEO(strtolower($title)) . '-' . time()
+        'id' => $type . '-' .$seo_id . '-' . $random_id,
+        'seo_id' => $seo_id,
+        'hash' => $random_id
     );
 
     $Cbucket->manager_orders[trim($type)][] = $order_array;
@@ -1588,7 +1593,7 @@ function display_manager_orders($type = 'video', $display = 'unselected')
                 $active = ' class="active"';
             }
             $output .= '<li' . $active . '>';
-            $output .= '<a href="' . ($query_string ? $query_string : '?') . 'omo=' . $key . '" id="' . $order['id'] . '" data-order="' . $key . '" data-type="' . $type . '">' . $order['title'] . '</a>';
+            $output .= '<a href="' . ($query_string ? $query_string : '?') . 'omo=' . $key . '" id="' . $order['id'] . '" data-name="'.$order['seo_id'].'" data-hash="'.$order['hash'].'" data-order="' . $key . '" data-type="' . $type . '">' . $order['title'] . '</a>';
             $output .= '</li>';
         }
 

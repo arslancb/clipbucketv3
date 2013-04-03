@@ -1,0 +1,16 @@
+<li class="{$classes}">
+    <div class="name-avatar">
+        <img src="{avatar details=$object }" class="avatar img-polaroid" />
+        {if object_has('heading')}<span class="name">{show_content_field('heading')}</span>{/if}
+        {if object_has('message')}{show_content_field('message')}{/if}
+    </div>
+    <div class="subscription-details clearfix">
+        <a href="{show_content_field('link')}" class="pull-left content-thumb"><img src="{show_content_field('thumb')}" /></a>
+        <a href="{show_content_field('link')}" class="content-title">{show_content_field('title')}</a>
+        {if object_has('date_added')}{what_time( show_content_field('date_added'), false )}{/if}
+        <span>
+            {if object_has('sub_title')}{show_content_field('sub_title')}{/if}
+        </span>
+        {show_content_field('views')|number_format} {lang code="views"}
+    </div>
+</li>

@@ -60,8 +60,8 @@ if(isset($_POST['updatePhotos']))
 {	
 	assign('step',3);
 }
-$collections = $cbphoto->collection->get_collections(array("type"=>"photos","user"=>userid()));
-assign('collections',$collections);
+
+register_anchor_function( 'load_plupload_upload_photo', 'cb_head' );
 	
 subtitle(lang('photos_upload'));
 //Displaying The Template

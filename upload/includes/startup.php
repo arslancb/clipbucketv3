@@ -307,6 +307,26 @@ $usercontent->add_new_content();
 //add_new_subscription( "photo", array( lang("Photo"), lang("Photos") ) );
 //add_subscription_template_file("subscriptions/blocks/photo.html");
 
-add_new_subscription_type( "video", lang("Video"), lang("Videos"), "subscriptions/blocks/video.html" );
-add_new_subscription_type( "photo", lang("Photo"), lang("Photos"), "subscriptions/blocks/photo.html" );
+function add_views_column( $fields ) {
+    $fields[] = 'views';
+    return $fields;
+}
+
+function add_subscription_seen_feature( $url ) {
+    $current = get_current_subscription_object();
+    return $url."&feature=subscription&ccid=".base64_encode( $current['content_id'].":".$current['content_type'] );
+}
+
+add_new_subscription_type( "video", lang("Video"), lang("Videos") );
+add_new_subscription_section( "videos" );
+add_new_subscription_db_values( "video", "videoid" );
+add_new_subscription_condition("video.active = 'yes' AND video.status = 'Successful' AND video.broadcast != 'unlisted' AND video.broadcast != 'private'");
+register_filter( 'video_content_fields_unsorted', 'add_views_column' );
+register_filter( 'subscription_content_link', 'add_subscription_seen_feature' );
+
+add_new_subscription_type( "photo", lang("Photo"), lang("Photos") );
+add_new_subscription_callback( "get_subscription_photo" );
+add_new_subscription_section( "photos" );
+add_new_subscription_db_values( "photos", "photo_id" );
+add_new_subscription_condition("photos.active = 'yes' AND photos.collection_id <> '0' ");
 ?>

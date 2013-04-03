@@ -1159,8 +1159,12 @@ function photo_manager_link_callbacks() {
  * @return STRING
  */
 function load_photo_plupload_block() {
-    $template = fetch(MODULES_DIR.'/uploader/photo_pluploader.html',false);
+    $template = fetch_template_file ( array( 'file' => 'blocks/upload/photo_uploader.html' ) );
     return $template;
+}
+
+function load_plupload_upload_photo() {
+    return template( MODULES_DIR.'/uploader/plupload/plupload.upload_photo.html', false );
 }
 
 /**

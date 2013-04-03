@@ -19,14 +19,32 @@ $mode = mysql_clean($mode);
 
 switch ($mode) {
     case "subscribe": {
-        $_POST['output'] = subscription_buttons( post('to') );
-        echo json_encode( $_POST );
+        $to = post( 'to' );
+        $insert_id = subscribe_user( $to );
+        
+        if ( error() ) {
+            echo json_encode( array( 'error' => error() ) );
+        }
+        
+        if ( msg() ) {
+            $output = subscription_buttons( $to );
+            echo json_encode( array( 'success' => msg(), 'output' => $output ) );
+        }
     }
     break;
     
     case "unsubscribe": {
-        $_POST['output'] = subscription_buttons( post('to') );
-        echo json_encode( $_POST );
+        $to = post('to');
+        unsubscribe_user( $to );
+        
+        if ( error() ) {
+            echo json_encode( array( 'error' => error() ) );
+        }
+        
+        if ( msg() ) {
+            $output = subscription_buttons( $to );
+            echo json_encode( array( 'success' => msg(), 'output' => $output ) );
+        }
     }
     break;
 
@@ -53,7 +71,16 @@ switch ($mode) {
     break;
     
     case "update_subscription_option": {
-        echo json_encode( $_POST );
+        
+        do_user_content_subscriptions( post('type'), post('owner'), post('action'), post('user') );
+                
+        if ( error() ) {
+            echo json_encode( array( 'error' => error() ) );
+        }
+        
+        if ( msg() ) {
+            echo json_encode( array( 'msg' => msg() ) );
+        }
     }
     break;
     

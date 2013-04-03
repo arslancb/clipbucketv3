@@ -476,6 +476,27 @@ CREATE TABLE IF NOT EXISTS  `{tbl_prefix}subscriptions` (
 -- Adding Video version to make older videos comaptible with new system
 ALTER TABLE  `{tbl_prefix}video` ADD  `version` FLOAT( 5 ) NOT NULL DEFAULT  '2.6';
 
+
 -- @Author Arslan
 -- Adding Slug field for videos to minimize the sql load
 ALTER TABLE  `{tbl_prefix}video` ADD  `slug` MEDIUMTEXT NOT NULL AFTER  `slug_id`;
+
+-- Creating subscriptions content table
+CREATE TABLE `{tbl_prefix}subscriptions_content` (
+  `subscription_content_id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `subscription_id` bigint(20) NOT NULL,
+  `content_id` bigint(20) NOT NULL,
+  `content_type` varchar(12) CHARACTER SET utf8 NOT NULL,
+  `content_owner_id` bigint(20) NOT NULL,
+  `date_added` datetime NOT NULL,
+  `time_added` bigint(20) NOT NULL,
+  `has_seen` enum('no','yes') CHARACTER SET utf8 NOT NULL DEFAULT 'no',
+  `is_content_hidden` enum('no','yes') CHARACTER SET utf8 NOT NULL DEFAULT 'no',
+  PRIMARY KEY (`subscription_content_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=24 ;
+
+-- Adding time column when user views the object
+ALTER TABLE  `{tbl_prefix}subscriptions_content` ADD  `seen_on` BIGINT NOT NULL AFTER  `has_seen`;
+
+-- Adding contetn_cache_id, this will actually be helpful is sending emails
+ALTER TABLE  `{tbl_prefix}subscriptions_content` ADD  `content_cache_id` BIGINT NOT NULL AFTER  `content_owner_id`;

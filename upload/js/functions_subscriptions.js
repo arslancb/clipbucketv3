@@ -1,8 +1,16 @@
+    
+    var  __subscription_options_timeout = 1500,
+            __subscription_options_timeout_counter;
+
 /**
  * Subscribe user
  */
 function subscribe_user( button ) {
     var data = {};
+    
+    if ( button.hasClass('disabled') ) {
+        return false;
+    }
     
     data['to'] = button.data('subscribe-to');
     data['id'] = button.attr('id');
@@ -11,13 +19,23 @@ function subscribe_user( button ) {
     data['parent'] = button.data('parent-page-id');
     data['name'] = button.data('subscribe-name');
     
+    button.attr( 'disabled', 'disabled' );
+    button.addClass('disabled');
+        
      amplify.request('users', data,function( d ) {
+         
+         if ( d.error ) {
+            button.removeAttr( 'disabled' );
+            button.removeClass('disabled');
+            displayError( d.error );
+         }
+         
          if ( d.success ) {
-             $('#'+d.id).after( d.output );
-             $('#'+d.id).remove();
+             $( '#'+data['id'] ).after( d.output );
+             $( '#'+data['id'] ).remove();
              
-            attach_subscription_events( $('#unsubscribe-'+button.data('subscribed-to')+'-button') );
-            attach_subscription_options_list( $('#unsubscribe-'+button.data('subscribed-to')+'-button') );
+            attach_subscription_events( $('#unsubscribe-'+data['to']+'-button') );
+            attach_subscription_options_list( $('#unsubscribe-'+data['to']+'-button') );
          }
      });
 }
@@ -35,15 +53,24 @@ function unsubscribe_user( btn ) {
     data['page'] = btn.data('page-id');
     data['parent'] = btn.data('parent-page-id');
     
+    btn.attr( 'disabled', 'disabled' );
+    btn.addClass('disabled');
+    
+    if ( $('#'+data['to']+'-'+data['subscription']+'-list') ) {
+       $('#'+data['to']+'-'+data['subscription']+'-list').remove();
+    }
+    
      amplify.request('users', data,function( d ) {
-         if ( d.output ) {
-             if ( $('#'+btn.data('subscribed-to')+'-'+btn.data('subscription-id')+'-list') ) {
-                $('#'+btn.data('subscribed-to')+'-'+btn.data('subscription-id')+'-list').remove();
-            }
-            
-            $('#'+d.id).after( d.output );
-            $('#'+d.id).remove();
-            attach_subscription_events( $('#subscribe-'+btn.data('subscribe-to')+'-button') );
+         if ( d.error ) {
+             btn.removeAttr( 'disabled' );
+            btn.removeClass('disabled');
+            displayError( d.error );
+         }
+         
+         if ( d.output ) {            
+            $( '#'+data['id'] ).after( d.output );
+            $( '#'+data['id'] ).remove();
+            attach_subscription_events( $('#subscribe-'+data['to']+'-button') );
          }
      });
 }
@@ -57,6 +84,11 @@ function attach_subscription_events( __subscribe_button ) {
         event.preventDefault();
 
         if ( __subscribe_button.data('is-subscribed') == true ) {
+            
+            if ( __subscription_options_timeout_counter ) {
+                clearTimeout( __subscription_options_timeout_counter );
+            }
+            
             unsubscribe_user( $( this ) );
         } else {
             subscribe_user( $( this ) )
@@ -70,18 +102,19 @@ function attach_subscription_events( __subscribe_button ) {
  */
 function attach_subscription_options_list( __subscribe_button ) {
     
-    if ( __subscribe_button.data('is-subscribed') != true && __subscribe_button.data('show-options') != true ) {
+    //alert( __subscribe_button.data('show-options') );
+    
+    if ( __subscribe_button.data('is-subscribed') != true || __subscribe_button.data('show-options') == undefined ) {
         return;
     }
-    
-    var  __subscription_options_timeout = 1500,
-            __subscription_options_timeout_counter;
             
         __subscribe_button.on({
             'mouseenter' : function( event ) {
                 __subscription_options_timeout_counter = setTimeout( function() {
                         
                         if ( $('#'+__subscribe_button.data('subscribed-to')+'-'+__subscribe_button.data('subscription-id')+'-list').css('display') == 'none' ) {
+                            $('.subscriptions-options').hide();
+                            __subscribe_button.addClass('subscription-options-opened');
                             $('#'+__subscribe_button.data('subscribed-to')+'-'+__subscribe_button.data('subscription-id')+'-list').show();
                             return;
                         }
@@ -104,10 +137,12 @@ function attach_subscription_options_list( __subscribe_button ) {
                             __subscribe_button.removeClass('loading-subscription-options');
                              __subscribe_button.addClass('subscription-options-opened');
                             if ( d.success ) {
+                                $('.subscriptions-options').hide();
+                                
                                 $('body').prepend( d.output );
                                 var options_list = $('#'+__subscribe_button.data('subscribed-to')+'-'+__subscribe_button.data('subscription-id')+'-list');
                                 options_list.css({
-                                    position : 'absolute',
+                                    position : 'absolute'
                                 });
                                 
                                 list_positions = get_subscription_options_container_positions( ( d.position ), __subscribe_button, options_list  );
@@ -115,39 +150,47 @@ function attach_subscription_options_list( __subscribe_button ) {
                                 options_list.css({
                                     'top' : list_positions['top']+"px",
                                     'left' : list_positions['left']+"px",
-                                    'zIndex' : '9999'
+                                    'zIndex' : '9999',
+                                    'display' : 'block'
                                 });
                                 
-                                options_list.find('li.subscription-type').on( 'click', function( event ) {
-                                    //Prevent Default Action
-                                    event.preventDefault();
-                                    
-                                    var _li = $( this ), data_ele = _li.find('a'), data = {};
-                                    
-                                    data['owner'] = data_ele.data('owner');
-                                    data['user'] = data_ele.data('user');
-                                    data['type'] = data_ele.data('type');
+                                options_list.find('.subscription-type-check[data-update=subscription-type]').on( 'click', function( event ) {
+                                    var _current_checkbox = $( this ), data = {};
+                                    _current_checkbox.attr( 'disabled', 'disabled' );
+
+                                    data['user'] = _current_checkbox.data('user');
+                                    data['owner'] = _current_checkbox.data('owner');
                                     data['mode'] = 'update_subscription_option';
-                                        
-                                    if ( _li.hasClass('checked') ) {
-                                        // Do unchecked
+                                    data['type'] = _current_checkbox.data('type');
+                                    
+                                    if ( _current_checkbox.prop('checked') == false ) {
                                         data['action'] = 'uncheck';
-                                        _li.removeClass('checked').addClass('unchecked');
-                                        _li.find('.subscription-check').removeClass('checked').addClass('unchecked');
+                                        _current_checkbox.parent('li.subscription-type').removeClass('checked').addClass('unchecked');
                                     } else {
-                                        // Do check
                                         data['action'] = 'check';
-                                        _li.removeClass('unchecked').addClass('checked');
-                                        _li.find('.subscription-check').removeClass('unchecked').addClass('checked');
+                                        _current_checkbox.parent('li.subscription-type').removeClass('unchecked').addClass('checked');
                                     }
                                     
+                                    
+                                    
                                     amplify.request( 'users', data, function( r ) {
+                                        _current_checkbox.removeAttr( 'disabled' );
+                                        options_list.hide();
+                                        
                                         if ( r.error ) {
+                                            if ( data['action'] == 'uncheck' ) {
+                                                _current_checkbox.prop( 'checked', true );
+                                                _current_checkbox.parent('li.subscription-type').removeClass('unchecked').addClass('checked');
+                                            } else {
+                                                _current_checkbox.prop( 'checked', false );
+                                                _current_checkbox.parent('li.subscription-type').removeClass('checked').addClass('unchecked');
+                                            }
+
                                             displayError( r.error );
                                         }
-                                    })
+                                    });
                                 });
-                                
+                                                                
                                 options_list.on( 'mouseleave', function() {
                                     options_list.hide();
                                     __subscribe_button.removeClass('subscription-options-opened')
@@ -214,9 +257,40 @@ function get_subscription_options_container_positions( position, button, list ) 
 }
 
 $( document ).ready( function() {
-    var __subscribe_button = $('.subscription-button');
+    var __subscribe_button = $('[data-subscribe-button=true]');
     
-    attach_subscription_events( __subscribe_button );
-    attach_subscription_options_list( __subscribe_button );
+    $.each( __subscribe_button, function( index, btn ) {
+        attach_subscription_events( $( btn ) );
+        attach_subscription_options_list( $( btn ) );
+    });
+
     
+    $('.subscription-type-check[data-update=subscription-type]').on( 'click', function( event ){
+        var _current_checkbox = $( this ), data = {};
+        //_current_checkbox.attr( 'disabled', 'disabled' );
+        
+        data['user'] = _current_checkbox.data('user');
+        data['owner'] = _current_checkbox.data('owner');
+        data['mode'] = 'update_subscription_option';
+        data['type'] = _current_checkbox.data('type');
+        
+        if ( _current_checkbox.prop('checked') == false ) {
+            data['action'] = 'uncheck';
+        } else {
+            data['action'] = 'check';
+        }
+        
+        amplify.request( 'users', data, function( r ) {
+            _current_checkbox.removeAttr( 'disabled' );
+            if ( r.error ) {
+                if ( data['action'] == 'uncheck' ) {
+                    _current_checkbox.prop( 'checked', true );
+                } else {
+                    _current_checkbox.prop( 'checked', false );
+                }
+                
+                displayError( r.error );
+            }
+        });
+    });
 }); 

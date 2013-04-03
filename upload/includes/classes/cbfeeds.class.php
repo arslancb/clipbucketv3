@@ -1371,8 +1371,8 @@ class cbfeeds
         $fields = array(
             'type' => $type,
             'type_id'=>$id,
-            'last_updated' => now(),
-            'time_added' => now(),
+            'last_updated' => time(),
+            'time_added' => time(),
             'content'=> ($content)
         );
         
