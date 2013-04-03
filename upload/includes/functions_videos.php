@@ -1510,7 +1510,7 @@ function get_video_fields($extra_fields=NULL)
             'videoid', 'title', 'description', 'tags', 'category',
             'rating', 'date_added', 'broadcast', 'file_server_path', 'files_thumbs_path',
             'file_thumbs_count', 'has_hd', 'has_mobile', 'file_directory', 'duration', 'views'
-            ,'rated_by', 'file_name', 'default_thumb', 'videokey','extras','slug','slug_id'
+            ,'rated_by', 'file_name', 'default_thumb', 'videokey','extras','slug','slug_id','version'
         );
 
     if ($extra_fields)
