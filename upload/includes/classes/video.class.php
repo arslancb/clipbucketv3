@@ -1844,6 +1844,7 @@ class CBvideo extends CBCategory {
             '2pass',
             'apply_watermark',
             'ffmpeg_cmd',
+            'mobile'
         );
 
         if ($array['height'] < 100)
@@ -2024,6 +2025,7 @@ class CBvideo extends CBCategory {
             '2pass',
             'apply_watermark',
             'ffmpeg_cmd',
+            'mobile'
         );
 
         if ($array['height'] < 100)
@@ -2077,13 +2079,13 @@ class CBvideo extends CBCategory {
             $values = apply_filters($values, 'video_profile_values');
 
             //Adding order
-            /*$order = $this->get_latest_profile_order();
+            $order = $this->get_latest_profile_order();
             $order = $order + 1;
 
             $profile_id = $array['profile_id'];
 
             $fields[] = 'profile_order';
-            $values[] = $order;*/
+            $values[] = $order;
             
            
             
@@ -2454,7 +2456,13 @@ class CBvideo extends CBCategory {
             
             return $files;
         }
-
+        
+        
+        $function_data = call_actions('get_video_files',$video);
+        
+        if($function_data) return $function_data;
+        
+        
         $query = "SELECT * FROM " .
         $query .= tbl('video_files');
         $query .= " LEFT JOIN " . tbl('video_profiles');

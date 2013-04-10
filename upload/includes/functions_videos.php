@@ -117,7 +117,7 @@ function get_thumb($vdetails, $num = 'default', $multi = false, $count = false, 
         $vdetails = $myquery->get_video_details($vdetails);
     
     $thumbs = $cbvid->get_video_extras($vdetails['videoid'],$vdetails['extras']);
-    $vdetails['thumbs'] = $thumbs['thumbs'];
+    $thumbs = $vdetails['thumbs'] = $thumbs['thumbs'];
     
     if ($vdetails['thumbs']) {
         if ($return_full_path) {
@@ -291,6 +291,7 @@ function get_thumb($vdetails, $num = 'default', $multi = false, $count = false, 
                 $num = 'big';
         }
 
+        
         $default_thumb = array_find($vdetails['file_name'] . '-' . $num, $thumbs);
 
         if (!empty($default_thumb))
@@ -500,6 +501,7 @@ function video_link($vdetails, $type = NULL) {
  * about {getSmartyThumb|getThumb}
  */
 function getSmartyThumb($params) {
+    
     return get_thumb($params['vdetails'], $params['num'], $params['multi'], $params['count_only'], true, true, $params['size']);
 }
 
@@ -698,8 +700,28 @@ function get_video_files($filename) {
     $query .= " WHERE " . tbl('video_files.file_name') . "='$filename'";
 
     $results = db_select($query);
+    $new_files = array();
+    if($results)
+    {
+        foreach($results as $file)
+        {
+            $file_url = VIDEOS_URL.'/';
 
-    return $results;
+            $file_url .= $video['file_directory'];
+            $file_url .= '/'.$video['file_name'];
+            $file_url .= $file['suffix'];
+            $file_url .= '.'.$file['ext'];
+
+
+            $file['file_path'] = $file_url;
+            
+            $new_files[] = $file;
+        }
+    }
+    
+    
+    if($new_files) return $new_files; 
+    return false;
 }
 
 function get_video_details($vid = NULL) {
@@ -1507,7 +1529,7 @@ function is_valid_broadcast($opt)
 function get_video_fields($extra_fields=NULL)
 {
     $fields = array(
-            'videoid', 'title', 'description', 'tags', 'category',
+            'videoid', 'title', 'description', 'tags', 'category','active',
             'rating', 'date_added', 'broadcast', 'file_server_path', 'files_thumbs_path',
             'file_thumbs_count', 'has_hd', 'has_mobile', 'file_directory', 'duration', 'views'
             ,'rated_by', 'file_name', 'default_thumb', 'videokey','extras','slug','slug_id','version'

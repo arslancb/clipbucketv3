@@ -30,7 +30,7 @@
              {lang code='search_for_s' assign='searchfor'}
                 <h2>{$searchfor|sprintf:$search.title}</h2>
                 <div>
-                <form name="search-form-{$search.title}" method="get" action="">
+                <form action="{link name='search_result'}" method="get" name="search" id="search" style="margin:0px; padding:0px;">  
                 <input type="hidden" name="type" value="{$stype}" />
                     {foreach from=$search.fields item=field}
                     	<div>

@@ -1299,7 +1299,7 @@ function bgexec($cmd)
 function array_find($needle, $haystack)
 {
     foreach ($haystack as $item)
-    {
+    { 
         if (strpos($item, $needle) !== FALSE)
         {
             return $item;

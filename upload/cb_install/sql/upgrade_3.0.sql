@@ -85,6 +85,7 @@ CREATE TABLE IF NOT EXISTS `{tbl_prefix}video_profiles` (
   `apply_watermark` enum('yes','no') NOT NULL,
   `ffmpeg_cmd` mediumtext NOT NULL,
   `active` enum('yes','no') NOT NULL DEFAULT 'yes',
+  `mobile` ENUM(  'yes',  'no' ) NOT NULL DEFAULT  'no' ,
   `date_added` datetime NOT NULL,
   PRIMARY KEY (`profile_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
