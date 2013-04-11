@@ -112,41 +112,58 @@ class CBvideo extends CBCategory {
      */
     function get_video($vid, $file = false,$cond=false) {
         global $db;
+        
+        if(!$vid) return false;
+        
+        $data = call_actions('get_video',$vid);
+        
+        if($data)
+        {
+            $video = apply_filters($data,'get_video');
+            return $video;
+        }
 
-        $userFields = array('userid', 'username', 'avatar', 'avatar_url',
-            'email', 'total_videos');
-
-        $ufieldsQuery = "";
-        foreach ($userFields as $ufield)
-            $ufieldsQuery .= ',users.' . $ufield;
+        
 
         if (!$file) {
             if (is_numeric($vid))
-                $cond = tbl("video.videoid='$vid'");
+                $cond = ("video.videoid='$vid'");
             else
-                $cond = tbl("video.videokey='$vid'");
+                $cond = ("video.videokey='$vid'");
         }else
-            $cond = tbl("video.file_name='$vid'");
+            $cond = ("video.file_name='$vid'");
 
+        
+       $fields_arr = array(
+            'video' => get_video_fields(),
+            'users' => get_user_fields()
+        );
 
-        $meta_query = $this->create_meta_query();
+        $fields = tbl_fields($fields_arr);
 
-        $results = $db->select(
-                //Joining Slugs and User table
-                tbl("video")
-                . ' LEFT JOIN ' . tbl('users') . ' ON '
-                . tbl('video.userid') . ' = ' . tbl('users.userid')
-                . ' LEFT JOIN ' . tbl('slugs') . ' ON '
-                . tbl('video.slug_id') . ' = ' . tbl('slugs.slug_id')
-                .' LEFT JOIN ' . tbl('video_meta') . ' ON '
-                . tbl('video.videoid') . ' = ' . tbl('video_meta.videoid'),
-                //Selecting fields
-                tbl("video.*" . $ufieldsQuery . ",slugs.*").','.$meta_query,
-                //Addind Condition
-                $cond);
+        $query = " SELECT ".$fields." FROM ";
+        $query .= tbl('video')." AS video ";
+        $query .= " LEFT JOIN ".tbl('users')." AS users ";
+        $query .= " ON video.userid = users.userid ";
+        
+        if($cond)
+        $query .= " WHERE ".$cond;
+        
+        $query .= " LIMIT 1 ";
+        
+        $results = db_select($query);
+        
+        
         //echo $db->db_query;
         if ($db->num_rows > 0) {
-            return $results[0];
+            
+            
+            $data = $results[0];
+            
+            call_actions('select_video',$data);
+            
+            $video = apply_filters($data,'get_video');
+            return $video;
         } else {
             return false;
         }
@@ -530,23 +547,31 @@ class CBvideo extends CBCategory {
 
 
         if (!has_access('admin_access', TRUE)) {
-            $superCond = $cond .= " " . tbl("video.status") . "='Successful' AND 
-			" . tbl("video.active") . "='yes' AND " . tbl("video.broadcast") . " !='unlisted' ";
+            
+            $params['admin_access'] = false;
+            
+            $superCond = $cond .= " " . ("video.status") . "='Successful' AND 
+			" . ("video.active") . "='yes' AND " . ("video.broadcast") . " !='unlisted' ";
         } else {
+            
+            $params['admin_access'] = true;
+            
             if ($params['active'])
-                $cond .= " " . tbl("video.active") . "='" . $params['active'] . "'";
+                $cond .= " " . ("video.active") . "='" . $params['active'] . "'";
 
             if ($params['status']) {
                 if ($cond != '')
                     $cond .=" AND ";
-                $cond .= " " . tbl("video.status") . "='" . $params['status'] . "'";
+                $cond .= " " . ("video.status") . "='" . $params['status'] . "'";
             }
             if ($params['broadcast']) {
                 if ($cond != '')
                     $cond .=" AND ";
-                $cond .= " " . tbl("video.broadcast") . "='" . $params['broadcast'] . "'";
+                $cond .= " " . ("video.broadcast") . "='" . $params['broadcast'] . "'";
             }
         }
+        
+        
 
         //Setting Category Condition
         $all = false;
@@ -571,7 +596,7 @@ class CBvideo extends CBCategory {
                 $count++;
                 if ($count > 1)
                     $cond .=" OR ";
-                $cond .= " " . tbl("video.category") . " LIKE '%#$cat_params#%' ";
+                $cond .= " " . ("video.category") . " LIKE '%#$cat_params#%' ";
             }
 
             $cond .= ")";
@@ -598,7 +623,7 @@ class CBvideo extends CBCategory {
             if (!is_array($params['user'])) {
                 if ($cond != '')
                     $cond .= ' AND ';
-                $cond .= " " . tbl("video.userid") . "='" . $params['user'] . "'";
+                $cond .= " " . ("video.userid") . "='" . $params['user'] . "'";
             }else {
                 if ($cond != '')
                     $cond .= ' AND (';
@@ -607,7 +632,7 @@ class CBvideo extends CBCategory {
                 foreach ($params['user'] as $user) {
                     if ($uQu > 0)
                         $cond .= ' OR ';
-                    $cond .= " " . tbl("video.userid") . "='" . $user . "'";
+                    $cond .= " " . ("video.userid") . "='" . $user . "'";
                     $uQu++;
                 }
 
@@ -619,7 +644,7 @@ class CBvideo extends CBCategory {
         if ($params['nonuser']) {
             if ($cond != '')
                 $cond .= ' AND ';
-            $cond .= " " . tbl("video.userid") . " <> '" . $params['nonuser'] . "' ";
+            $cond .= " " . ("video.userid") . " <> '" . $params['nonuser'] . "' ";
         }
 
         $tag_n_title = '';
@@ -633,7 +658,7 @@ class CBvideo extends CBCategory {
                 $total = count($tags);
                 $loop = 1;
                 foreach ($tags as $tag) {
-                    $tag_n_title .= " " . tbl('video.tags') . " LIKE '%" . $tag . "%'";
+                    $tag_n_title .= " " . ('video.tags') . " LIKE '%" . $tag . "%'";
                     if ($loop < $total)
                         $tag_n_title .= " OR ";
                     $loop++;
@@ -641,14 +666,14 @@ class CBvideo extends CBCategory {
             }else {
                 if ($tag_n_title != '')
                     $tag_n_title .= ' OR ';
-                $tag_n_title .= " " . tbl('video.tags') . " LIKE '%" . $params['tags'] . "%'";
+                $tag_n_title .= " " . ('video.tags') . " LIKE '%" . $params['tags'] . "%'";
             }
         }
         //TITLE
         if ($params['title']) {
             if ($tag_n_title != '')
                 $tag_n_title .= ' OR ';
-            $tag_n_title .= " " . tbl('video.title') . " LIKE '%" . $params['title'] . "%'";
+            $tag_n_title .= " " . ('video.title') . " LIKE '%" . $params['title'] . "%'";
         }
 
         if ($tag_n_title) {
@@ -661,14 +686,14 @@ class CBvideo extends CBCategory {
         if ($params['featured']) {
             if ($cond != '')
                 $cond .= ' AND ';
-            $cond .= " " . tbl("video.featured") . " = '" . $params['featured'] . "' ";
+            $cond .= " " . ("video.featured") . " = '" . $params['featured'] . "' ";
         }
 
         //VIDEO ID
         if ($params['videoid']) {
             if ($cond != '')
                 $cond .= ' AND ';
-            $cond .= " " . tbl("video.videoid") . " = '" . $params['videoid'] . "' ";
+            $cond .= " " . ("video.videoid") . " = '" . $params['videoid'] . "' ";
         }
 
         //VIDEO ID
@@ -682,7 +707,7 @@ class CBvideo extends CBCategory {
                     if (is_numeric($vid)) {
                         if ($curVid > 0)
                             $cond .= " OR ";
-                        $cond .= " " . tbl("video.videoid") . " = '" . $vid . "' ";
+                        $cond .= " " . ("video.videoid") . " = '" . $vid . "' ";
                     }
                     $curVid++;
                 }
@@ -696,7 +721,7 @@ class CBvideo extends CBCategory {
             if (!is_array($params['videokey'])) {
                 if ($cond != '')
                     $cond .= ' AND ';
-                $cond .= " " . tbl("video.videokey") . " = '" . $params['videokey'] . "' ";
+                $cond .= " " . ("video.videokey") . " = '" . $params['videokey'] . "' ";
             }else {
                 if ($cond != '')
                     $cond .= ' AND (';
@@ -705,7 +730,7 @@ class CBvideo extends CBCategory {
                 foreach ($params['videokey'] as $videokey) {
                     if ($vkeyQue > 0)
                         $cond .= ' OR ';
-                    $cond .= " " . tbl("video.videokey") . " = '" . $videokey . "' ";
+                    $cond .= " " . ("video.videokey") . " = '" . $videokey . "' ";
                     $vkeyQue++;
                 }
 
@@ -719,12 +744,12 @@ class CBvideo extends CBCategory {
             if (!is_array($params['exclude'])) {
                 if ($cond != '')
                     $cond .= ' AND ';
-                $cond .= " " . tbl('video.videoid') . " <> '" . $params['exclude'] . "' ";
+                $cond .= " " . ('video.videoid') . " <> '" . $params['exclude'] . "' ";
             }else {
                 foreach ($params['exclude'] as $exclude) {
                     if ($cond != '')
                         $cond .= ' AND ';
-                    $cond .= " " . tbl('video.videoid') . " <> '" . $exclude . "' ";
+                    $cond .= " " . ('video.videoid') . " <> '" . $exclude . "' ";
                 }
             }
         }
@@ -738,7 +763,7 @@ class CBvideo extends CBCategory {
 
             if ($cond != '')
                 $cond .= ' AND ';
-            $cond .= " " . tbl('video.duration') . " " . $duration_op . " '" . $params['duration'] . "' ";
+            $cond .= " " . ('video.duration') . " " . $duration_op . " '" . $params['duration'] . "' ";
         }
         
         
@@ -746,7 +771,7 @@ class CBvideo extends CBCategory {
             
             if ($cond != '')
                 $cond .= ' AND ';
-            $cond .= " " . tbl('video.has_mobile') . "='".$params['has_mobile']."'";
+            $cond .= " " . ('video.has_mobile') . "='".$params['has_mobile']."'";
         }
 
         //Filename
@@ -755,7 +780,7 @@ class CBvideo extends CBCategory {
             if (!is_array($params['filename'])) {
                 if ($cond != '')
                     $cond .= ' AND ';
-                $cond .= " " . tbl('video.file_name') . " <> '" . $params['filename'] . "' ";
+                $cond .= " " . ('video.file_name') . " <> '" . $params['filename'] . "' ";
             }else {
                 if ($cond != '')
                     $cond .= ' AND (';
@@ -766,7 +791,7 @@ class CBvideo extends CBCategory {
                 foreach ($params['filename'] as $filename) {
                     if ($fileNameQue > 0)
                         $cond .= ' OR ';
-                    $cond .= " " . tbl("video.file_name") . " = '" . $filename . "' ";
+                    $cond .= " " . ("video.file_name") . " = '" . $filename . "' ";
                     $fileNameQue++;
                 }
 
@@ -801,8 +826,7 @@ class CBvideo extends CBCategory {
                 $ufieldq .= ",users." . $ufield;
             }
 
-            if (!empty($cond))
-                $cond .= " AND ";
+           
 
             //$meta_query = $this->create_meta_query();
             
@@ -825,11 +849,27 @@ class CBvideo extends CBCategory {
             if($order)
                 $order_query = " ORDER BY ".$order;
             
+            if($cond)
+                $query .= " WHERE ".$cond;
+            
             $query .= $order_query;
             $query .= $limit_query;
             
+            
+            $start = microtime(true);
+                    
+            $action_data = call_actions('get_videos', $query);
+            
+            if($action_data)
+            {
+
+                $result = $action_data;
+            }else
+            
             $result = db_select($query);
             
+            $end = microtime(true);
+                
             
 
         }
@@ -840,49 +880,89 @@ class CBvideo extends CBCategory {
             if ($superCond)
                 $cond = $superCond . " AND ";
 
-            $cond .= "MATCH(" . tbl("video.title,video.tags") . ") 
+            $cond .= "MATCH(" . ("video.title,video.tags") . ") 
 			AGAINST ('" . cbsearch::set_the_key($params['title']) . "' IN BOOLEAN MODE) ";
             if ($params['exclude']) {
                 if ($cond != '')
                     $cond .= ' AND ';
-                $cond .= " " . tbl('video.videoid') . " <> '" . $params['exclude'] . "' ";
+                $cond .= " " . ('video.videoid') . " <> '" . $params['exclude'] . "' ";
             }
 
-            $result = $db->select(tbl('video')
-                    . ' LEFT JOIN ' . tbl('users') . ' ON '
-                    . tbl('video.userid') . ' = ' . tbl('users.userid')
-                    . ' LEFT JOIN ' . tbl('slugs') . ' ON '
-                    . tbl('video.slug_id') . ' = ' . tbl('slugs.slug_id')
-                    , tbl('video.*' . $ufieldq . ',slugs.*'), $cond . " " . tbl("video.userid") . " = " . tbl("users.userid"), $limit, $order);
+            
+            $query = " SELECT ".$fields." FROM ".tbl('video')." AS video ";
+            $query .= " LEFT JOIN ".tbl('users')." AS users ";
+            $query .= " ON video.userid = users.userid ";
+            if($cond)
+                $query .= " WHERE ".$cond;
+            if($limit)
+                $limit_query = " LIMIT ".$limit;
+            if($order)
+                $order_query = " ORDER BY ".$order;
+            $query .= $order_query;
+            $query .= $limit_query;
+            
+            
+            $action_data = call_actions('get_videos', $query);
+            
+            if($action_data)
+            {
+                $result = $action_data;
+            }else
+            
+            $result = db_select($query);
 
-            if ($db->num_rows == 0) {
+            if ($db->num_rows == 0) 
+            {
                 $cond = "";
                 if ($superCond)
                     $cond = $superCond . " AND ";
                 //Try Finding videos via tags
-                $cond .= "MATCH(" . tbl("video.title,video.tags") . ") 
+                $cond .= "MATCH(" . ("video.title,video.tags") . ") 
 				AGAINST ('" . cbsearch::set_the_key($params['tags']) . "' IN BOOLEAN MODE) ";
                 if ($params['exclude']) {
                     if ($cond != '')
                         $cond .= ' AND ';
-                    $cond .= " " . tbl('video.videoid') . " <> '" . $params['exclude'] . "' ";
+                    $cond .= " " . ('video.videoid') . " <> '" . $params['exclude'] . "' ";
                 }
 
+                
+                $query = " SELECT ".$fields." FROM ".tbl('video')." AS video ";
+                $query .= " LEFT JOIN ".tbl('users')." AS users ";
+                $query .= " ON video.userid = users.userid ";
+                if($cond)
+                    $query .= " WHERE ".$cond;
+                if($limit)
+                    $limit_query = " LIMIT ".$limit;
+                if($order)
+                    $order_query = " ORDER BY ".$order;
+                $query .= $order_query;
+                $query .= $limit_query;
+                
+                $action_data = call_actions('get_videos', $query);
+            
+                if($action_data)
+                {
+                    $result = $action_data;
+                }else
 
-                $result = $db->select(tbl('video')
-                        . ' LEFT JOIN ' . tbl('users') . ' ON '
-                        . tbl('video.userid') . ' = ' . tbl('users.userid')
-                        . ' LEFT JOIN ' . tbl('slugs') . ' ON '
-                        . tbl('video.slug_id') . ' = ' . tbl('slugs.slug_id')
-                        , tbl('video.*' . $ufieldq . ',slugs.*'), $cond . " " . tbl("video.userid") . " = " . tbl("users.userid"), $limit, $order);
+                $result = db_select($query);
+                
+                
             }
-            assign($params['assign'], $result);
         }
 
+        
+        $result = apply_filters($result,'get_videos');
+        
+        if(!$action_data && $result)
+        {
+            call_actions('select_videos', array('query'=>$query,'results'=>$result));
+        }
+        
         if ($params['pr'])
             pr($result, true);
         if ($params['count_only'])
-            return $result = $db->count(tbl('video'), '*', $cond);
+            return $result = $db->count(tbl('video')." AS video ", 'videoid', $cond);
         if ($params['assign'])
             assign($params['assign'], $result);
         else

@@ -433,54 +433,54 @@ function video_link($vdetails, $type = NULL) {
     $plist = "";
     if (SEO == 'yes') {
 
+        if ($vdetails['slug']) {
+            $slug = $vdetails['slug'];
+        }else
+        {
+            //check if slug was recently added...
+            if(!$vdetails['slug'])
+            $slug_arr = get_slug($vdetails['videoid'], 'v');
+            else
+                $slug_arr = $vdetails;
+
+            if (!$slug_arr) {
+                $slug_arr = add_slug(slug($vdetails['title']), $vdetails['videoid'], 'v');
+
+                $db->update(tbl('video'), array('slug_id','slug'), array($slug_arr['id'],$slug_arr['slug'])
+                , "videoid='" . $vdetails['videoid'] . "'");
+            }
+            
+            $slug = $slug_arr['slug'];
+        }
+        
+        
         if ($vdetails['playlist_id'])
             $plist = '?play_list=' . $vdetails['playlist_id'];
 
         switch (config('seo_vido_url')) {
             default:
-                $link = BASEURL . '/video/' . $vdetails['videokey'] . '/' . SEO(clean(str_replace(' ', '-', $vdetails['title']))) . $plist;
+                $link = BASEURL . '/video/' . $vdetails['videokey'] . '/' . $slug . $plist;
                 break;
 
             case 1: {
-                    $link = BASEURL . '/' . SEO(clean(str_replace(' ', '-', $vdetails['title']))) . '_v' . $vdetails['videoid'] . $plist;
+                    $link = BASEURL . '/' . $slug . '_v' . $vdetails['videoid'] . $plist;
                 }
                 break;
 
             case 2: {
-                    $link = BASEURL . '/video/' . $vdetails['videoid'] . '/' . SEO(clean(str_replace(' ', '-', $vdetails['title']))) . $plist;
+                    $link = BASEURL . '/video/' . $vdetails['videoid'] . '/' . $slug . $plist;
                 }
                 break;
 
             case 3: {
-                    $link = BASEURL . '/video/' . $vdetails['videoid'] . '_' . SEO(clean(str_replace(' ', '-', $vdetails['title']))) . $plist;
+                    $link = BASEURL . '/video/' . $vdetails['videoid'] . '_' . $slug. $plist;
                 }
 
             case 4: {
-                    if ($vdetails['slug']) {
-                        $link = BASEURL . '/video/'
-                        . $vdetails['slug']
-                        . $plist;
-                    } else {
-                        
-                        //check if slug was recently added...
-                        if(!$vdetails['slug'])
-                        $slug_arr = get_slug($vdetails['videoid'], 'v');
-                        else
-                            $slug_arr = $vdetails;
+                $link = BASEURL . '/video/'. $slug . $plist;
 
-                        if (!$slug_arr) {
-                            $slug_arr = add_slug(slug($vdetails['title']), $vdetails['videoid'], 'v');
-                            
-                            $db->update(tbl('video'), array('slug_id','slug'), array($slug_arr['id'],$slug_arr['slug'])
-                            , "videoid='" . $vdetails['videoid'] . "'");
-                        }
-
-                        $link = BASEURL . '/video/'
-                        . $slug_arr['slug']
-                        . $plist;
-                    }
-                }
-                break;
+            }
+            break;
         }
     } else {
         if ($vdetails['playlist_id'])

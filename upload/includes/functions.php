@@ -3373,6 +3373,21 @@ function set_config($var, $val)
     return true;
 }
 
+
+/**
+ * add multiple runtime configs
+ * 
+ * @param ARRAY $configs
+ */
+function set_configs($configs)
+{
+    foreach($configs as $key => $config)
+    {
+        set_config($key,$config);
+    }
+}
+
+
 if (!function_exists('cb_show_page'))
 {
 

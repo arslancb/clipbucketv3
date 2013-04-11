@@ -6,6 +6,8 @@
  | @ Software : ClipBucket , © PHPBucket.com							
  ***************************************************************
 */
+
+
 define("THIS_PAGE",'videos');
 define("PARENT_PAGE",'videos');
 require 'includes/config.inc.php';
@@ -137,4 +139,6 @@ subtitle($subtitle);
 //Displaying The Template
 template_files('videos.html');
 display_it();
+
+
 ?>
