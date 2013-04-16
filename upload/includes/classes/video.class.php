@@ -2317,7 +2317,7 @@ class CBvideo extends CBCategory {
         
         $encoded = json_encode($extras);
         
-        db_update(tbl('video'), array('extras'=>$extras)," videoid='$vid' ");
+        db_update(tbl('video'), array('extras'=>$encoded)," videoid='$vid' ");
     }
 
     /**

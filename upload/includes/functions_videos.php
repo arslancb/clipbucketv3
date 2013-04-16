@@ -133,7 +133,10 @@ function get_thumb($vdetails, $num = 'default', $multi = false, $count = false, 
         }else
             $path = '';
 
+        if(!is_array($vdetails['thumbs']))
         $thumbs = json_decode($vdetails['thumbs'], true);
+        else
+            $thumbs = $vdetails['thumbs'];
         $_thumbs = array();
         if ($thumbs) {
             foreach ($thumbs as $the_size => $thumbs) {

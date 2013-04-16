@@ -711,38 +711,115 @@ class userquery extends CBCategory
     /**
      * Function used to get user details using userid
      */
-    function get_user_details($id = NULL, $checksess = false, $profile = false, $cond = NULL)
+    function get_user_details($id = NULL, $checksess = false, $profile = false, $cond = NULL,$username=false)
     {
         global $db, $sess;
-        if ($profile === true)
-        {
-            $join = " LEFT JOIN " . tbl('user_profile') . " ON " . tbl('users.userid') . ' = ' . tbl('user_profile.userid');
-        }
-        /* if(!$id)
-          $id = userid(); */
-        if (is_numeric($id))
-            $results = $db->select(tbl('users') . $join, '*', " " . tbl('users.userid') . " ='$id'");
-        else
-            $results = $db->select(tbl('users') . $join, '*', " " . tbl('users.username') . "='" . $id . "' OR " . tbl('users.email') . "='" . $id . "'");
-        $udetails = $results[0];
+        
+        
+        
+        $fields_arr = array(
+            'user'  => get_user_fields(),
+            'profile'   => array(
+                'profile_id','show_my_collections','profile_title',
+                'profile_desc','channel_tagline','featured_video','first_name','last_name',
+                'avatar','show_dob','postal_code','time_zone','profile_tags','rating',
+                'voters','rated_by'
+            )
+        );
+        
+        if(!$profile)
+            unset($fields_arr['profile']);
+        
+        $fields = tbl_fields($fields_arr);
 
+        $query = "SELECT ".$fields." FROM ".tbl('users')." AS user ";
+        
+        if($profile)
+        {
+            $query .= " LEFT JOIN ".tbl('user_profile')." AS profile ";
+            $query .= " on users.userid = profile.userid ";
+        }
+        
+        
+        $is_email = strstr($id, '@');
+        
+        if($username || !is_numeric($id))
+        {
+            if($is_email)
+            {
+                $query .= " WHERE user.email ='$id' ";
+                $data_mode = 'get_user_with_email';
+                $set_mode = 'select_user_with_email';
+            }else
+            {
+                $query .= " WHERE user.username = '$id' ";
+                
+                $data_mode = 'get_user_with_username';
+                $set_mode = 'select_user_with_username';
+                
+            }
+        }else
+        {
+            $query .= " WHERE user.userid='$id' ";
+            
+            $data_mode = 'get_user';
+            $set_mode = 'select_user';
+        }
+        
+        if($cond) $query .= $cond;
+        
+        $query .= " LIMIT 1 ";
+        
+        $start = microtime(true);
+        
+      
+        $data = call_actions($data_mode, $id);
+        
+        if($data)
+        {
+            echo 'got it with memcache';
+            $udetails = $data;
+        }else
+        {
+            $results = db_select($query);
+            if($results) $udetails = $results[0];
+            
+            
+            if($results)
+            call_actions($set_mode,$results);
+        }
+           
+    
+        
+        
+        $end = microtime(true);
+        
+  
+        
+        
         if (!$checksess)
-            return $udetails;
-        else
+        {
+            return apply_filters($udetails, 'get_user');;
+        }else
         {
             $session = $this->sessions['smart_sess'];
-            $udetails['user_session_key'];
             $smart_sess = md5($udetails['user_session_key'] . $sess->get('sess_salt'));
 
             if ($smart_sess == $session['session_value'])
             {
                 $this->is_login = true;
-                return $udetails;
+                return apply_filters($udetails, 'get_user');;;
             }else
                 return false;
         }
     }
 
+    function get_user_with_username($username,$cond=NULL)
+    {
+        return $this->get_user_details($username, false, false, $cond,true);
+    }
+    
+    
     function get($uid, $cond = NULL)
     {
         return $this->get_user_details($uid, false, false, $cond);

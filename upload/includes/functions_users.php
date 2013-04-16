@@ -629,8 +629,8 @@ function get_user_fields($extra_fields=NULL)
 {
     $fields = array(
         'userid', 'username', 'email',
-        'first_name', 'last_name', 'avatar',
-        'avatar_url', 'sex', 'dob'
+        'first_name', 'last_name', 'avatar','active',
+        'avatar_url', 'sex', 'dob','user_session_key','level'
     );
 
     if ($extra_fields)
