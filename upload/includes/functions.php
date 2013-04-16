@@ -4076,6 +4076,21 @@ if ( !function_exists('cb_sql_table') ) {
     }
 }
 
+/**
+ * function get file_upload_url 
+ * 
+ */
+function get_file_upload_url()
+{
+    $url = BASEURL.'/actions/file_upload.php';
+    
+    $new_url = cb_call_functions('get_file_upload_url');
+    
+    if($new_url) return $new_url;
+    
+    return $url;
+}
+
 
 /**
  * when adding submenus for admin area, you have to 
