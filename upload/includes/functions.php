@@ -4082,7 +4082,7 @@ if ( !function_exists('cb_sql_table') ) {
  */
 function get_file_upload_url()
 {
-    $url = BASEURL.'/actions/file_upload.php';
+    $url = BASEURL.'/actions/file_uploader.php';
     
     $new_url = cb_call_functions('get_file_upload_url');
     
