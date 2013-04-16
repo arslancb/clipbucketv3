@@ -17,10 +17,13 @@ $cb_converter = new CBConverter();
 
 $max_processes = 5;
 
+$file_name = @$argv[1];
+$file_name = @$_GET['file_name'];
+
 while (1)
 {
 //Get Vido
-    $queued_files = $cbupload->get_queued_files();
+    $queued_files = $cbupload->get_queued_files($file_name);
 
     define('CONV_TEST_MODE', false);
 
