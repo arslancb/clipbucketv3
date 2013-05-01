@@ -6,11 +6,6 @@
 /upload/files/photos
 !/upload/files/photos/no-photo_*.png
 
-/upload/plugins/cb_multi_server
-/upload/plugins/cb_tunepk
-/upload/plugins/cb_facebook
-/upload/plugins/admin_remote_upload
 
-/upload/styles/tunev3
-/upload/player/cbplayerv1
 /upload/includes/dbconnect.php
+/upload/includes/clipbucket.php
