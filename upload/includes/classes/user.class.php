@@ -777,7 +777,7 @@ class userquery extends CBCategory
         
         if($data)
         {
-            echo 'got it with memcache';
+            
             $udetails = $data;
         }else
         {

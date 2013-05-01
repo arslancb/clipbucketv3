@@ -29,26 +29,26 @@ if($type!='videos')
 	$search->category = $_GET['category'];
 else
 {
-	$child_ids = array();
-	if($_GET['category'])
-		foreach($_GET['category'] as $category)
-		{
-			$childs = $cbvid->get_sub_categories(mysql_clean($category));
-			if($childs)
-			foreach($childs as $child)
-			{
-				$child_ids[] = $child['category_id'];
-				$subchilds = $childs = $cbvid->get_sub_categories($child['category_id']);
-				if($subchilds)
-				foreach($subchilds as $subchild)
-				{
-					$child_ids[] = $subchild['category_id'];
-				}
-			}
-			$child_ids[] = mysql_clean($category);	
-		}
+    $child_ids = array();
+    if($_GET['category'])
+    foreach($_GET['category'] as $category)
+    {
+        $childs = $cbvid->get_sub_categories(mysql_clean($category));
+        if($childs)
+        foreach($childs as $child)
+        {
+            $child_ids[] = $child['category_id'];
+            $subchilds = $childs = $cbvid->get_sub_categories($child['category_id']);
+            if($subchilds)
+            foreach($subchilds as $subchild)
+            {
+                    $child_ids[] = $subchild['category_id'];
+            }
+        }
+        $child_ids[] = mysql_clean($category);	
+    }
 	
-	$search->category = $child_ids;
+    $search->category = $child_ids;
 }
 $search->date_margin = mysql_clean($_GET['datemargin']);
 $search->sort_by = mysql_clean($_GET['sort']);

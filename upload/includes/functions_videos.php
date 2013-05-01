@@ -704,14 +704,17 @@ function get_video_files($filename) {
 
     $results = db_select($query);
     $new_files = array();
+    
+    
     if($results)
     {
         foreach($results as $file)
         {
+            
             $file_url = VIDEOS_URL.'/';
 
-            $file_url .= $video['file_directory'];
-            $file_url .= '/'.$video['file_name'];
+            $file_url .= $file['file_directory'];
+            $file_url .= '/'.$file['file_name'];
             $file_url .= $file['suffix'];
             $file_url .= '.'.$file['ext'];
 

@@ -416,7 +416,11 @@ class CBvideo extends CBCategory {
                 }
 
                 $db->update(tbl('video'), $query_field, $query_val, " videoid='$vid'");
-
+                
+                call_actions('update_video',array(
+                    'videoid'   => $vid , 'data' => $array
+                ));
+                
                 //echo $db->db_query;
 
                 e(lang("class_vdo_update_msg"), 'm');
@@ -2557,9 +2561,28 @@ class CBvideo extends CBCategory {
         //Now Get Rows and return that data
         if ($db->num_rows > 0) {
             $files = $data->getrows();
+            $new_files = array();
             
+            if($files)
+            {
+                foreach($files as $file)
+                {
+
+                    $file_url = VIDEOS_URL.'/';
+
+                    $file_url .= $video['file_directory'];
+                    $file_url .= '/'.$video['file_name'];
+                    $file_url .= $file['suffix'];
+                    $file_url .= '.'.$file['ext'];
+
+
+                    $file['file_path'] = $file_url;
+
+                    $new_files[] = $file;
+                }
+            }
            
-            return $files;
+            return $new_files;
         }
         else
             return false;

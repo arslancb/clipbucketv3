@@ -51,3 +51,7 @@
 .video-options .btn{padding: 0px 2px; line-height: normal}
 
 .video-box .video-thumb .video-badge{ position: absolute; top: 5px; right: 5px}
+
+.cb-watch-video-top{background-color: #1a1a1a; width: 100%}
+.cb-video-player-cont{width: 733px; float: left; margin-right: 17px;}
+.cb-video-player-sidebar{float: right; width: 350px;}
