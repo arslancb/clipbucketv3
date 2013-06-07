@@ -116,10 +116,11 @@ function get_thumb($vdetails, $num = 'default', $multi = false, $count = false, 
     if (!is_array($vdetails))
         $vdetails = $myquery->get_video_details($vdetails);
     
-    $thumbs = $cbvid->get_video_extras($vdetails['videoid'],$vdetails['extras']);
-    $vdetails['thumbs'] = $thumbs['thumbs'];
+    $extras = $cbvid->get_video_extras($vdetails['videoid'],$vdetails['extras']);
+    $thumbs = $extras['thumbs'];
+    $vdetails['thumbs'] = $thumbs;
     
-    if ($vdetails['thumbs']) {
+    if ( $vdetails['thumbs'] ) {
         if ($return_full_path) {
             $folder = '';
             $folder = $vdetails['file_directory'];
