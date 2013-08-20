@@ -59,9 +59,8 @@
     $(function() {
     
         var plSwfUrl = '/plupload/js/plupload.flash.swf';
-        var plFileUploader ='{$baseurl}/actions/file_uploader.php?upload=yes';
-        
-        plFileUploader = 'http://lahore.clipbucket.com/multiservers/v3/actions/file_uploader.php?upload=yes';
+        var plFileUploader = '{get_file_upload_url()}?upload=yes';
+
         
         var filenames = Array();
         

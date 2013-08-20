@@ -62,7 +62,29 @@ register_widget(array(
 ));
 
 
+register_widget(array(
+    'id' => 'html-box',
+    'title' => 'HTML Box',
+    'description' => 'Displays an HTML box',
+    'icon' => FRONT_TEMPLATEURL.'/images/widgets/html-box.png',
+    'callback' => 'displayUserBox',
+    'callback_admin' => 'displayUserBoxAdmin'
+));
 
+
+/**
+ * Register sidebar for watch video player
+ */
+$sidebar_player = array(
+    'title' => lang('Watch Video Player'),
+    'description'   => lang('Watch video player sidebar'),
+    'before_title'  => '<h3>',
+    'after_title'   => '</h3>',
+    'before_widget' => '<div class="cb-widget">',
+    'after_widget'  => '</div>',
+    'id'            => 'watch-video-player-sidebar'
+);
+register_sidebar($sidebar_player);
 
 //regsitering cb custom functions
 cb_register_function('cbv3_show_rating','show_rating');

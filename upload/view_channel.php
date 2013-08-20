@@ -22,7 +22,7 @@ $u = $u ? $u : $_GET['username'];
 $u = $u ? $u : $_GET['uid'];
 $u = $u ? $u : $_GET['u'];
 
-$udetails = $userquery->get_user_details($u);
+$udetails = $userquery->get_user_with_username($u);
 if($udetails)
 {
 	

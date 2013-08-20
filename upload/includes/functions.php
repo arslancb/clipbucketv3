@@ -1299,7 +1299,7 @@ function bgexec($cmd)
 function array_find($needle, $haystack)
 {
     foreach ($haystack as $item)
-    {
+    { 
         if (strpos($item, $needle) !== FALSE)
         {
             return $item;
@@ -3373,6 +3373,21 @@ function set_config($var, $val)
     return true;
 }
 
+
+/**
+ * add multiple runtime configs
+ * 
+ * @param ARRAY $configs
+ */
+function set_configs($configs)
+{
+    foreach($configs as $key => $config)
+    {
+        set_config($key,$config);
+    }
+}
+
+
 if (!function_exists('cb_show_page'))
 {
 
@@ -4059,6 +4074,21 @@ if ( !function_exists('cb_sql_table') ) {
         }
         return false;
     }
+}
+
+/**
+ * function get file_upload_url 
+ * 
+ */
+function get_file_upload_url()
+{
+    $url = BASEURL.'/actions/file_uploader.php';
+    
+    $new_url = cb_call_functions('get_file_upload_url');
+    
+    if($new_url) return $new_url;
+    
+    return $url;
 }
 
 

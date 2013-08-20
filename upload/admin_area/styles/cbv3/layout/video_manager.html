@@ -153,7 +153,7 @@ Manage all your videos here, change categories , delete and edit. Read more
             <tr>
             	<td><input type="checkbox" class="check-item" name="check_video[]" value="{$video.videoid}"></td>
                 <td>{$video.videoid}</td>
-                <td><img src="{getThumb vdetails=$video}" widt="60" height="45"/></td>
+                <td><img src="{getThumb vdetails=$video}" width="60" height="45"/></td>
                 <td><a href="#" class="popover-classx" rel="popover" 
                         data-content='<h6>Description</h6>{$video.description|truncate:300}<h6>Category</h6>{$video.category|categories:video}' 
                         data-original-title="More details">{$video.title}</a>

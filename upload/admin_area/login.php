@@ -36,13 +36,13 @@ if(isset($_POST['login'])){
 	
 	//Loggin User
 	if($userquery->login_user($username,$password))
-			redirect_to('index.php');
+        redirect_to('index.php');
 
 }
 
 
 if(userid() && !has_access('admin_access',true))
-	e(lang("you_dont_hv_perms"));
+    e(lang("you_dont_hv_perms"));
 	
 
 subtitle('Admin Login');

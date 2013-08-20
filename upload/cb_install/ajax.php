@@ -84,7 +84,8 @@ include('clipbucket.php');
 		 'countries'		=> 'countries.sql',
 		 'email_templates'	=> 'email_templates.sql',
 		 'pages'			=> 'pages.sql',
-		 'user_levels'		=> 'user_levels.sql'
+		 'user_levels'		=> 'user_levels.sql',
+                 'video_profiles'       => 'video_profiles.sql'
 	 );	 
 	 
 	 $next = false;

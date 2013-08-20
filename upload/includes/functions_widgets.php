@@ -207,6 +207,7 @@ function get_widget_details($id,$sidebar = false)
 function widget_callback_admin($widget,$sidebar)
 {
     $widget = get_widget_details($widget,$sidebar);
+    
     $adminCallback = $widget['callback_admin'];
     if(!$adminCallback)
         $adminCallback = $widget['options']['callback_admin'];
@@ -214,7 +215,7 @@ function widget_callback_admin($widget,$sidebar)
     if($adminCallback)
     {
         if(function_exists($adminCallback))
-        {         
+        {  
             return $adminCallback($widget);
         }
     }

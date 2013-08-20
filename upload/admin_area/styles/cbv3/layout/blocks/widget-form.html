@@ -23,6 +23,8 @@
         {* Load our custom function to display more input values and/or options *}
         
         {assign var=widget_admin_callback value=widget_callback_admin($widget.id,$sidebar.id)}
+        
+        {$widget_admin_callback}
     </form>
   </div>
   <div class="modal-footer">

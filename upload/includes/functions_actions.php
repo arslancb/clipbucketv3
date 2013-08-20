@@ -18,6 +18,7 @@
         
     function register_action($name,$type=NULL)
     {
+        
         global $Cbucket;
         if(!$type) return false;
         
@@ -44,6 +45,8 @@
             }else
             {
                 $Cbucket->actionList[$type][] = $name;
+                
+                
             } 
         }
  
@@ -551,6 +554,7 @@
      */
     function call_actions($place,$param)
     {
+        
         $funcs = get_actions($place);
         if($funcs)
         {

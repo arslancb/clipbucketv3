@@ -33,27 +33,32 @@
         //get the file for video...
         $files = $in['files'];
         
+        $video_files = array();
+        
         if($files)
         foreach($files as $key => $file)
         {
             if($key)
             if($key=='flv' || $key=='mp4' || $key=='mobile')
             {
+
                 $video_file = $file;
                 break;
             }
             
             if($file['status']=='s' && $file['is_original']!='yes')
             {
-                $video_file = VIDEOS_URL.'/'.$file['file_directory'].'/';
-                $video_file .= $file['file_name'].$file['suffix'].'.'.$file['ext'];
+                
+                $video_file = $file['file_path'];
             
                 break;
-            } 
-            
+            }
         }
         
+        
         assign('file',$video_file);
+        assign('video_files',$video_files);
+        
         $player = fetch(VIDEO_JS_DIR.'/player.html',false);
         return $player;
     }

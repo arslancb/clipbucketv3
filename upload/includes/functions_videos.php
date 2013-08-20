@@ -116,9 +116,11 @@ function get_thumb($vdetails, $num = 'default', $multi = false, $count = false, 
     if (!is_array($vdetails))
         $vdetails = $myquery->get_video_details($vdetails);
     
+	
     $extras = $cbvid->get_video_extras($vdetails['videoid'],$vdetails['extras']);
     $thumbs = $extras['thumbs'];
     $vdetails['thumbs'] = $thumbs;
+
     
     if ( $vdetails['thumbs'] ) {
         if ($return_full_path) {
@@ -134,7 +136,10 @@ function get_thumb($vdetails, $num = 'default', $multi = false, $count = false, 
         }else
             $path = '';
 
+        if(!is_array($vdetails['thumbs']))
         $thumbs = json_decode($vdetails['thumbs'], true);
+        else
+            $thumbs = $vdetails['thumbs'];
         $_thumbs = array();
         if ($thumbs) {
             foreach ($thumbs as $the_size => $thumbs) {
@@ -292,6 +297,7 @@ function get_thumb($vdetails, $num = 'default', $multi = false, $count = false, 
                 $num = 'big';
         }
 
+        
         $default_thumb = array_find($vdetails['file_name'] . '-' . $num, $thumbs);
 
         if (!empty($default_thumb))
@@ -433,54 +439,54 @@ function video_link($vdetails, $type = NULL) {
     $plist = "";
     if (SEO == 'yes') {
 
+        if ($vdetails['slug']) {
+            $slug = $vdetails['slug'];
+        }else
+        {
+            //check if slug was recently added...
+            if(!$vdetails['slug'])
+            $slug_arr = get_slug($vdetails['videoid'], 'v');
+            else
+                $slug_arr = $vdetails;
+
+            if (!$slug_arr) {
+                $slug_arr = add_slug(slug($vdetails['title']), $vdetails['videoid'], 'v');
+
+                $db->update(tbl('video'), array('slug_id','slug'), array($slug_arr['id'],$slug_arr['slug'])
+                , "videoid='" . $vdetails['videoid'] . "'");
+            }
+            
+            $slug = $slug_arr['slug'];
+        }
+        
+        
         if ($vdetails['playlist_id'])
             $plist = '?play_list=' . $vdetails['playlist_id'];
 
         switch (config('seo_vido_url')) {
             default:
-                $link = BASEURL . '/video/' . $vdetails['videokey'] . '/' . SEO(clean(str_replace(' ', '-', $vdetails['title']))) . $plist;
+                $link = BASEURL . '/video/' . $vdetails['videokey'] . '/' . $slug . $plist;
                 break;
 
             case 1: {
-                    $link = BASEURL . '/' . SEO(clean(str_replace(' ', '-', $vdetails['title']))) . '_v' . $vdetails['videoid'] . $plist;
+                    $link = BASEURL . '/' . $slug . '_v' . $vdetails['videoid'] . $plist;
                 }
                 break;
 
             case 2: {
-                    $link = BASEURL . '/video/' . $vdetails['videoid'] . '/' . SEO(clean(str_replace(' ', '-', $vdetails['title']))) . $plist;
+                    $link = BASEURL . '/video/' . $vdetails['videoid'] . '/' . $slug . $plist;
                 }
                 break;
 
             case 3: {
-                    $link = BASEURL . '/video/' . $vdetails['videoid'] . '_' . SEO(clean(str_replace(' ', '-', $vdetails['title']))) . $plist;
+                    $link = BASEURL . '/video/' . $vdetails['videoid'] . '_' . $slug. $plist;
                 }
 
             case 4: {
-                    if ($vdetails['slug']) {
-                        $link = BASEURL . '/video/'
-                        . $vdetails['slug']
-                        . $plist;
-                    } else {
-                        
-                        //check if slug was recently added...
-                        if(!$vdetails['slug'])
-                        $slug_arr = get_slug($vdetails['videoid'], 'v');
-                        else
-                            $slug_arr = $vdetails;
+                $link = BASEURL . '/video/'. $slug . $plist;
 
-                        if (!$slug_arr) {
-                            $slug_arr = add_slug(slug($vdetails['title']), $vdetails['videoid'], 'v');
-                            
-                            $db->update(tbl('video'), array('slug_id','slug'), array($slug_arr['id'],$slug_arr['slug'])
-                            , "videoid='" . $vdetails['videoid'] . "'");
-                        }
-
-                        $link = BASEURL . '/video/'
-                        . $slug_arr['slug']
-                        . $plist;
-                    }
-                }
-                break;
+            }
+            break;
         }
     } else {
         if ($vdetails['playlist_id'])
@@ -501,6 +507,7 @@ function video_link($vdetails, $type = NULL) {
  * about {getSmartyThumb|getThumb}
  */
 function getSmartyThumb($params) {
+    
     return get_thumb($params['vdetails'], $params['num'], $params['multi'], $params['count_only'], true, true, $params['size']);
 }
 
@@ -699,8 +706,31 @@ function get_video_files($filename) {
     $query .= " WHERE " . tbl('video_files.file_name') . "='$filename'";
 
     $results = db_select($query);
+    $new_files = array();
+    
+    
+    if($results)
+    {
+        foreach($results as $file)
+        {
+            
+            $file_url = VIDEOS_URL.'/';
 
-    return $results;
+            $file_url .= $file['file_directory'];
+            $file_url .= '/'.$file['file_name'];
+            $file_url .= $file['suffix'];
+            $file_url .= '.'.$file['ext'];
+
+
+            $file['file_path'] = $file_url;
+            
+            $new_files[] = $file;
+        }
+    }
+    
+    
+    if($new_files) return $new_files; 
+    return false;
 }
 
 function get_video_details($vid = NULL) {
@@ -1508,10 +1538,10 @@ function is_valid_broadcast($opt)
 function get_video_fields($extra_fields=NULL)
 {
     $fields = array(
-            'videoid', 'title', 'description', 'tags', 'category',
+            'videoid', 'title', 'description', 'tags', 'category','active',
             'rating', 'date_added', 'broadcast', 'file_server_path', 'files_thumbs_path',
             'file_thumbs_count', 'has_hd', 'has_mobile', 'file_directory', 'duration', 'views'
-            ,'rated_by', 'file_name', 'default_thumb', 'videokey','extras','slug','slug_id'
+            ,'rated_by', 'file_name', 'default_thumb', 'videokey','extras','slug','slug_id','version'
         );
 
     if ($extra_fields)

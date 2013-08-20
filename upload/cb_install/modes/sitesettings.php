@@ -23,7 +23,7 @@ here you can set basic configuration of your website, you can change them later 
     
     <div class="field">
     <label for="title">Website title</label>
-    <input name="title" type="text" id="title" class="br5px" value="Clipbucket v2">
+    <input name="title" type="text" id="title" class="br5px" value="Clipbucket v3">
     </div>
     
     <div class="field">

@@ -16,7 +16,8 @@ function displayUserBox($widget)
  */
 function displayUserBoxAdmin($widget)
 {
-    return Fetch('/layout/widgets/user-box-admin.html',FRONT_TEMPLATEDIR);
+  
+    Fetch('/layout/widgets/user-box-admin.html',FRONT_TEMPLATEDIR);
 }
 
 /**
