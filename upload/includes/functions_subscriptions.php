@@ -719,7 +719,7 @@ function get_subscription_initial_objects( $type, $userid ) {
     $query .= " WHERE ".get_where();
     end_where();
     $query .= " ORDER BY ".$table.".".$date." DESC";
-    $query .= " LIMIT 5";
+    $query .= " LIMIT 15";
     
     $results = db_select( $query );
     if ( $results ) {

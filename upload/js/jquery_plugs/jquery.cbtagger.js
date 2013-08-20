@@ -376,8 +376,8 @@
 					var TAGGER = $("<div />").attr({
 						id : getID('tagger')	
 					}).addClass('tagger-container').css({
-						width: options.defaultWidth+"px",
-						height: options.defaultHeight+"px",
+						width: defaultWidth+"%",
+						height: defaultHeight+"%",
 						opacity: 1	
 					});
 					
