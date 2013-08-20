@@ -9,3 +9,6 @@
 
 /upload/includes/dbconnect.php
 /upload/includes/clipbucket.php
+
+#PHPStorm Directory
+/upload/.idea

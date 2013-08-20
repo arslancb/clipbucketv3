@@ -1807,7 +1807,8 @@ function get_active_template_name() {
  */
 function can_change_template() {
     $is_allowed = ALLOW_STYLE_SELECT;
-    
+    $can_change = true;
+
     if ( !$is_allowed ) {
         if ( has_access('admin_access') ) {
             $can_change =  true;

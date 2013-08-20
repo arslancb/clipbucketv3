@@ -299,7 +299,7 @@ class ClipBucket
                 $template = $_SESSION['the_template'] = $_GET['set_the_template'];
             }
             
-            if( !is_dir(STYLES_DIR.'/'.$template) || !$template ) {
+            if( !is_dir(STYLES_DIR.'/'.$template) || !$template || is_template_hidden( $template ) ) {
               $template = 'cbv3';
             }
             
