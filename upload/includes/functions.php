@@ -97,55 +97,7 @@ function pass_code($string)
     return $password;
 }
 
-//Mysql Clean Queries
-function sql_free($id)
-{
-    if (!get_magic_quotes_gpc())
-    {
-        $id = addslashes($id);
-    }
-    return $id;
-}
 
-function mysql_clean($id, $replacer = true)
-{
-    if (is_array($id))
-    {
-        $new_array = array();
-
-        foreach ($id as $key => $value)
-        {
-            $new_array[$key] = mysql_clean($value);
-        }
-
-        return $new_array;
-    }
-    //$id = clean($id);
-
-    if (get_magic_quotes_gpc())
-    {
-        $id = stripslashes($id);
-    }
-    $id = htmlspecialchars(mysql_real_escape_string($id));
-    if ($replacer)
-        $id = Replacer($id);
-    return $id;
-}
-
-function escape_gpc($in)
-{
-    if (get_magic_quotes_gpc())
-    {
-        $in = stripslashes($in);
-    }
-    return $in;
-}
-
-function filter_sql($data)
-{
-    $data = mysql_real_escape_string($data);
-    return $data;
-}
 
 //Redirect Using JAVASCRIPT
 
@@ -835,45 +787,6 @@ function getSmartyCategoryList($params)
     return getCategoryList($params);
 }
 
-/**
- * Function used to insert data in database
- * @param : table name
- * @param : fields array
- * @param : values array
- * @param : extra params
- */
-function dbInsert($tbl, $flds, $vls, $ep = NULL)
-{
-    global $db;
-    $db->insert($tbl, $flds, $vls, $ep);
-}
-
-/**
- * Function used to Update data in database
- * @param : table name
- * @param : fields array
- * @param : values array
- * @param : Condition params
- * @params : Extra params
- */
-function dbUpdate($tbl, $flds, $vls, $cond, $ep = NULL)
-{
-    global $db;
-    return $db->update($tbl, $flds, $vls, $cond, $ep);
-}
-
-/**
- * Function used to Delete data in database
- * @param : table name
- * @param : fields array
- * @param : values array
- * @params : Extra params
- */
-function dbDelete($tbl, $flds, $vls, $ep = NULL)
-{
-    global $db;
-    return $db->delete($tbl, $flds, $vls, $ep);
-}
 
 /**
  * *
@@ -905,192 +818,6 @@ function set_id($code, $id)
     return $Cbucket->ids[$code] = $id;
 }
 
-/**
- * Function used to select data from database
- */
-function dbselect($tbl, $fields = '*', $cond = false, $limit = false, $order = false, $p = false)
-{
-    global $db;
-    return $db->dbselect($tbl, $fields, $cond, $limit, $order, $p);
-}
-
-function db_select($query)
-{
-    global $db;
-    return $db->_select($query);
-}
-
-function db_update($tbl, $fields, $cond)
-{
-    global $db;
-
-    $count = 0;
-    foreach ($fields as $field => $val)
-    {
-
-        if ($count > 0)
-            $fields_query .= ',';
-
-
-        $needle = substr($val, 0, 2);
-
-        if ($needle != '{{')
-            $value = "'" . filter_sql($val) . "'";
-        else
-        {
-            $val = substr($val, 2, strlen($val) - 4);
-            $value = filter_sql($val);
-        }
-
-        $fields_query .= $field . "=$value ";
-        $count++;
-    }
-
-    //Complete Query
-    $query = "UPDATE $tbl SET $fields_query WHERE $cond $ep";
-    //if(!mysql_query($query)) die($query.'<br>'.mysql_error());
-    $db->total_queries++;
-    $db->total_queries_sql[] = $query;
-    $db->Execute($query);
-
-    if (mysql_error())
-        die($db->db_query . '<br>' . mysql_error());
-
-    return true;
-}
-
-function db_insert($tbl, $fields)
-{
-    global $db;
-
-    $count = 0;
-
-    $query_fields = array();
-    $query_values = array();
-
-
-    foreach ($fields as $field => $val)
-    {
-
-        $query_fields[] = $field;
-
-        $needle = substr($val, 0, 2);
-
-        if ($needle != '{{')
-            $query_values[] = "'" . filter_sql($val) . "'";
-        else
-        {
-            $val = substr($val, 2, strlen($val) - 4);
-            $query_values[] = filter_sql($val);
-        }
-
-        $count++;
-    }
-
-    $fields_query = implode(',', $query_fields);
-    $values_query = implode(',', $query_values);
-
-
-
-
-    //Complete Query
-    $query = "INSERT INTO $tbl ($fields_query) VALUES ($values_query) $ep";
-
-    //if(!mysql_query($query)) die($query.'<br>'.mysql_error());
-    $db->total_queries++;
-    $db->total_queries_sql[] = $query;
-    $db->Execute($query);
-
-    if (mysql_error())
-    {
-        //if(LOG_DB_ERRORS)
-
-        die($db->db_query . '<br>' . mysql_error());
-    }
-
-    return $db->insert_id();
-}
-
-function db_multi_insert($tbl, $multi_fields)
-{
-    global $db;
-
-    $count = 0;
-
-    if ($multi_fields)
-    {
-
-        foreach ($multi_fields as $fields)
-        {
-            $query_fields = array();
-            $query_values = array();
-
-            foreach ($fields as $field => $val)
-            {
-
-                $query_fields[] = $field;
-
-                $needle = substr($val, 0, 2);
-
-                if ($needle != '{{')
-                    $query_values[] = "'" . filter_sql($val) . "'";
-                else
-                {
-                    $val = substr($val, 2, strlen($val) - 4);
-                    $query_values[] = filter_sql($val);
-                }
-
-                $count++;
-            }
-
-            $fields_query = implode(',', $query_fields);
-            $values_query[] = '(' . implode(',', $query_values) . ')';
-        }
-
-        $values_query_multi = implode(',', $values_query);
-    }
-
-
-
-
-    //Complete Query
-    $query = "INSERT INTO $tbl ($fields_query) VALUES $values_query_multi ";
-
-    //if(!mysql_query($query)) die($query.'<br>'.mysql_error());
-    $db->total_queries++;
-    $db->total_queries_sql[] = $query;
-    $db->Execute($query);
-
-    if (mysql_error())
-    {
-        //if(LOG_DB_ERRORS)
-
-        die($db->db_query . '<br>' . mysql_error());
-    }
-
-    return $db->insert_id();
-}
-
-/**
- * Function used to count fields in mysql
- * @param TABLE NAME
- * @param Fields
- * @param condition
- */
-function dbcount($tbl, $fields = '*', $cond = false)
-{
-    global $db;
-    if ($cond)
-        $condition = " Where $cond ";
-    $query = "Select Count($fields) AS counted From $tbl $condition";
-    $result = $db->Execute($query);
-
-    $db->total_queries++;
-    $db->total_queries_sql[] = $query;
-
-    $counted = $result->fields['counted'];
-    return $counted;
-}
 
 /**
  * An easy function for erorrs and messages (e is basically short form of exception)
@@ -4008,50 +3735,6 @@ function end_where()
     unset($Cbucket->sql_where);
 }
 
-/**
- * Format array into table fields
- * 
- * @param ARRAY
- * @return STRING
- */
-function tbl_fields($array, $tbl = false)
-{
-    $the_fields = "";
-    
-    
-    if ($array)
-    {
-        foreach ($array as $key => $_fields)
-        {
-            
-            if (is_array($_fields))
-            {
-                foreach ($_fields as $field)
-                {
-                    if ($the_fields)
-                        $the_fields .=", ";
-                    $the_fields .= $key . '.' . $field;
-                }
-            }else
-            {
-                $field = $_fields;
-
-                if ($the_fields)
-                    $the_fields .=", ";
-
-                if ($tbl)
-                    $the_tbl = tbl($tbl). '.' ;
-                else
-                    $the_tbl = '';
-
-               $the_fields .= $the_tbl . $field;
-            }
-        }
-    }
-    
-    if($the_fields) return $the_fields;
-}
-
 if ( !function_exists('cb_sql_table') ) {
     /**
      * Since we start using AS in our sql queries, it was getting
@@ -4113,6 +3796,7 @@ function plug_url($file,$dir,$admin_base=false)
     return $url;
 }
 
+include('functions_db.php');
 //Including videos functions
 include("functions_videos.php");
 //Including Users Functions
