@@ -292,7 +292,7 @@ class cbsearch
 	 * it is used to get results within defined time span
 	 * ie today, this week , this month or this year
 	 */
-	function date_margin($date_column='date_added',$date_margin=NULL)
+	static function date_margin($date_column='date_added',$date_margin=NULL)
 	{
 		if(!$date_margin)
 			$date_margin = $this->date_margin;

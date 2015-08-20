@@ -2,6 +2,48 @@
 
 
 
+/**
+    * Function used to insert data in database
+    * @param : table name
+    * @param : fields array
+    * @param : values array
+    * @param : extra params
+    */
+    function dbInsert($tbl,$flds,$vls,$ep=NULL)
+    {
+        global $db ;
+        $db->insert($tbl,$flds,$vls,$ep);
+    }
+    
+    /**
+    * Function used to Update data in database
+    * @param : table name
+    * @param : fields array
+    * @param : values array
+    * @param : Condition params
+    * @params : Extra params
+    */
+    function dbUpdate($tbl,$flds,$vls,$cond,$ep=NULL)
+    {
+        global $db ;
+        return $db->update($tbl,$flds,$vls,$cond,$ep);      
+    }
+    
+    
+    
+    /**
+    * Function used to Delete data in database
+    * @param : table name
+    * @param : fields array
+    * @param : values array
+    * @params : Extra params
+    */
+    function dbDelete($tbl,$flds,$vls,$ep=NULL)
+    {
+        global $db ;
+        return $db->delete($tbl,$flds,$vls,$ep);        
+    }
+    
 //Mysql Clean Queries
 function sql_free($id) {
     if (!get_magic_quotes_gpc()) {
@@ -296,5 +338,67 @@ function select( $query ) {
     return cb_select( $query );
 }
 
+
+function db_multi_insert($tbl, $multi_fields)
+{
+    global $db;
+
+    $count = 0;
+
+    if ($multi_fields)
+    {
+
+        foreach ($multi_fields as $fields)
+        {
+            $query_fields = array();
+            $query_values = array();
+
+            foreach ($fields as $field => $val)
+            {
+
+                $query_fields[] = $field;
+
+                $needle = substr($val, 0, 2);
+
+                if ($needle != '{{')
+                    $query_values[] = "'" . filter_sql($val) . "'";
+                else
+                {
+                    $val = substr($val, 2, strlen($val) - 4);
+                    $query_values[] = filter_sql($val);
+                }
+
+                $count++;
+            }
+
+            $fields_query = implode(',', $query_fields);
+            $values_query[] = '(' . implode(',', $query_values) . ')';
+        }
+
+        $values_query_multi = implode(',', $values_query);
+    }
+
+
+
+
+    //Complete Query
+    $query = "INSERT INTO $tbl ($fields_query) VALUES $values_query_multi ";
+
+    /*//if(!mysql_query($query)) die($query.'<br>'.mysql_error());
+    $db->total_queries++;
+    $db->total_queries_sql[] = $query;
+    $db->Execute($query);
+
+    if (mysql_error())
+    {
+        //if(LOG_DB_ERRORS)
+
+        die($db->db_query . '<br>' . mysql_error());
+    }*/
+
+    $db->write($query);
+
+    return $db->insert_id();
+}
 
 ?>

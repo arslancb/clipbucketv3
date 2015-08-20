@@ -619,6 +619,8 @@ class Upload {
      * FUNCTION USED TO DISPLAY DATE FORM
      */
     function loadDateForm($date = NULL, $sep = '/', $bg_process = FALSE) {
+
+        if(!$date) $date = array();
         global $LANG, $formObj;
         $month_array = array('' => '--');
         $day_array = array('' => '--');

@@ -96,6 +96,8 @@ require_once('functions.php');
 
 
 check_install('before');
+require_once('classes/db.class.php');
+
 require_once('dbconnect.php');
 require_once('classes/ClipBucket.class.php');
 

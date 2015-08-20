@@ -969,6 +969,8 @@ function parse_duration($log) {
  * So wrap it with end() and problem solved.
  */
 function get_thumb_num($name) {
+
+    if(is_string($name) && $name)
     $list = end(explode('-', $name));
     $list = explode('.', $list);
     return $list[0];

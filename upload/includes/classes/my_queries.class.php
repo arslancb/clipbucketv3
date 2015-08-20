@@ -21,42 +21,28 @@
  * @param : table name
  * @return : prefix_table_name;
  */
-function tbl($tbl)
-{
-    global $DBNAME;
-    $prefix = TABLE_PREFIX;
-    $tbls = explode(",", $tbl);
-    $new_tbls = "";
-    foreach ($tbls as $ntbl)
-    {
-        if (!empty($new_tbls))
-            $new_tbls .= ",";
-        $new_tbls .= $DBNAME . "." . $prefix . $ntbl;
-    }
 
-    return $new_tbls;
-}
 
 class myquery
 {
 
-    function Set_Website_Details($name, $value)
+    function Set_Website_Details($name,$value)
     {
         //mysql_query("UPDATE config SET value = '".$value."' WHERE name ='".$name."'");
-        global $db, $Cbucket;
-
-        $this->config_exists($name, true);
-
-        $db->update(tbl("config"), array('value'), array($value), " name = '" . $name . "'");
+        global $db,$Cbucket;
+        
+        $this->config_exists($name,true);
+        
+        $db->update(tbl("config"),array('value'),array($value)," name = '".$name."'");
         //echo $db->db_query."<br/><br/>";
         $Cbucket->configs = $Cbucket->get_configs();
     }
-
+    
     function Get_Website_Details()
     {
-
-        $query = mysql_query("SELECT * FROM " . tbl("config"));
-        while ($row = mysql_fetch_array($query))
+        
+        $query = db_select("SELECT * FROM ".tbl("config"));
+        foreach($query as $row)
         {
             $name = $row['name'];
             $data[$name] = $row['value'];

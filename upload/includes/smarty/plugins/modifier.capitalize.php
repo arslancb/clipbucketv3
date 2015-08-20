@@ -30,7 +30,9 @@ function smarty_modifier_capitalize($string, $uc_digits = false, $lc_rest = fals
             $upper_string = mb_convert_case( $string, MB_CASE_TITLE, Smarty::$_CHARSET );
         } else {
             // uppercase word breaks
-            $upper_string = preg_replace("!(^|[^\p{L}'])([\p{Ll}])!eS" . Smarty::$_UTF8_MODIFIER, "stripslashes('\\1').mb_convert_case(stripslashes('\\2'),MB_CASE_UPPER, '" . addslashes(Smarty::$_CHARSET) . "')", $string);
+            //$upper_string = preg_replace("!(^|[^\p{L}'])([\p{Ll}])!S" . Smarty::$_UTF8_MODIFIER, "stripslashes('\\1').mb_convert_case(stripslashes('\\2'),MB_CASE_UPPER, '" . addslashes(Smarty::$_CHARSET) . "')", $string);
+            //$upper_string = preg_replace_callback();
+            $upper_string = strtoupper($string);
         }
         // check uc_digits case
         if (!$uc_digits) {
@@ -40,7 +42,7 @@ function smarty_modifier_capitalize($string, $uc_digits = false, $lc_rest = fals
                 }
             } 
         }
-        $upper_string = preg_replace("!((^|\s)['\"])(\w)!e" . Smarty::$_UTF8_MODIFIER, "stripslashes('\\1').mb_convert_case(stripslashes('\\3'),MB_CASE_UPPER, '" . addslashes(Smarty::$_CHARSET) . "')", $upper_string);
+        $upper_string = preg_replace("!((^|\s)['\"])(\w)!" . Smarty::$_UTF8_MODIFIER, "stripslashes('\\1').mb_convert_case(stripslashes('\\3'),MB_CASE_UPPER, '" . addslashes(Smarty::$_CHARSET) . "')", $upper_string);
         return $upper_string;
     }
     
