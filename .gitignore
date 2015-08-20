@@ -12,6 +12,8 @@
 
 #PHPStorm Directory
 /upload/.idea
-/upload/cache/*
+upload/cache/*
 /upload/files/*
 /upload/images/*
+
+upload/cache/comments/index.html
