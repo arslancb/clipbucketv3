@@ -7,7 +7,7 @@
 
 
 <dl>
-<? $permissions = checkPermissions(); ?>
+<?php $permissions = checkPermissions(); ?>
 <?php
     foreach($permissions as $permission)
     {
