@@ -15,7 +15,7 @@
         <dt style="width:300px"><?php echo $permission['path']?></dt>
         
         <dd><?php echo msg_arr($permission);?></dd>
-        <?
+        <?php
     }
 ?>
     
