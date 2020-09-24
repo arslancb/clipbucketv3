@@ -12,9 +12,9 @@
     foreach($permissions as $permission)
     {
         ?>
-        <dt style="width:300px"><?=$permission['path']?></dt>
+        <dt style="width:300px"><?php echo $permission['path']?></dt>
         
-        <dd><?=msg_arr($permission);?></dd>
+        <dd><?php echo msg_arr($permission);?></dd>
         <?
     }
 ?>
@@ -24,10 +24,10 @@
 
 <form name="installation" method="post" id="installation">
     <div style="padding:10px 0px" align="right">
-	<?=button('Recheck',' onclick="$(\'#mode\').val(\'permission\');
+	<?php echo button('Recheck',' onclick="$(\'#mode\').val(\'permission\');
 	 $(\'#installation\').submit()" ',true);?>
      
-	<?=button('Continue To Next Step',' onclick="$(\'#installation\').submit()" ');?></div>
+	<?php echo button('Continue To Next Step',' onclick="$(\'#installation\').submit()" ');?></div>
     
     <?php if(!$upgrade): ?>
     <input type="hidden" name="mode" value="database"  id="mode"/>
